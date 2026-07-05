@@ -1,0 +1,13 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- The Shelf — icon mark -->
+  <!-- book spines, slightly uneven for warmth -->
+  <g stroke-linecap="round">
+    <rect x="21" y="38" width="10" height="40" rx="2" fill="#2b2621"/>
+    <rect x="33" y="26" width="8" height="52" rx="2" fill="#2b2621" transform="rotate(-6 37 52)"/>
+    <rect x="45" y="44" width="12" height="34" rx="2" fill="#c1613e"/>
+    <rect x="61" y="32" width="9" height="46" rx="2" fill="#2b2621" transform="rotate(4 65.5 55)"/>
+    <rect x="74" y="50" width="7" height="28" rx="2" fill="#2b2621"/>
+  </g>
+  <!-- the shelf itself -->
+  <line x1="14" y1="80" x2="86" y2="80" stroke="#2b2621" stroke-width="5" stroke-linecap="round"/>
+</svg>

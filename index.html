@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The Shelf — mood-based recommendations across music, movies & series, anime, academics, gaming, and lifestyle.">
+    <title>The Shelf — find your next favorite thing</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main>
+        <section id="landingPage">
+            <header class="siteNav">
+                <img src="the-shelf-logo-horizontal.svg" alt="The Shelf" class="navLogo">
+                <div class="authCon">
+                    <button class="btn btn-ghost">Log In</button>
+                    <button class="btn btn-primary">Sign Up</button>
+                </div>
+            </header>
+
+            <div id="landingPageMainCon">
+                <div class="heroCon">
+                    <span class="eyebrow"><i class="fa-solid fa-compass"></i> Mood-based recommendations</span>
+                    <h1>Find your next <em>favorite thing.</em></h1>
+                    <p>
+                        The Shelf suggests what to watch, play, read, listen to, or do — across six categories:
+                        Music, Movies & Series, Anime, Academics, Gaming, and Lifestyle — matched to your genre
+                        and how you're feeling right now.
+                    </p>
+                    <div class="heroStats">
+                        <div class="statItem"><i class="fa-solid fa-layer-group"></i><span>6 categories</span></div>
+                        <div class="statItem"><i class="fa-solid fa-face-smile"></i><span>Mood matched</span></div>
+                        <div class="statItem"><i class="fa-solid fa-bolt"></i><span>Instant picks</span></div>
+                    </div>
+                    <button onclick="gotoChat()" id="chatEntryBttn" class="btn btn-primary">
+                        Get recommendations <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <div class="catboxCon">
+                    <div class="catbox">
+                        <span class="catIcon" style="color: #d9a441;"><i class="fa-solid fa-music"></i></span>
+                        <h3>Music</h3>
+                    </div>
+                    <div class="catbox">
+                        <span class="catIcon" style="color: #b8433c;"><i class="fa-solid fa-clapperboard"></i></span>
+                        <h3>Movies & Series</h3>
+                    </div>
+                    <div class="catbox">
+                        <span class="catIcon" style="color: #c94577;"><i class="fa-solid fa-dragon"></i></span>
+                        <h3>Anime</h3>
+                    </div>
+                    <div class="catbox">
+                        <span class="catIcon" style="color: #3e6fa3;"><i class="fa-solid fa-book"></i></span>
+                        <h3>Academics</h3>
+                    </div>
+                    <div class="catbox">
+                        <span class="catIcon" style="color: #4f9d6e;"><i class="fa-solid fa-gamepad"></i></span>
+                        <h3>Gaming</h3>
+                    </div>
+                    <div class="catbox">
+                        <span class="catIcon" style="color: #c97a45;"><i class="fa-solid fa-dumbbell"></i></span>
+                        <h3>Lifestyle</h3>
+                    </div>
+                </div>
+            </div>
+
+            <section class="howItWorks" id="howItWorks">
+                <span class="eyebrow">How it works</span>
+                <h2>Three steps to your next pick</h2>
+                <div class="stepsGrid">
+                    <div class="stepCard">
+                        <span class="stepNum">01</span>
+                        <i class="fa-solid fa-shapes"></i>
+                        <h3>Pick a category</h3>
+                        <p>Start with what you're in the mood to do — music, a show, a game, or something new to learn.</p>
+                    </div>
+                    <div class="stepCard">
+                        <span class="stepNum">02</span>
+                        <i class="fa-solid fa-sliders"></i>
+                        <h3>Set genre & mood</h3>
+                        <p>Narrow it down with a genre and how you're feeling — mood is optional, but it helps.</p>
+                    </div>
+                    <div class="stepCard">
+                        <span class="stepNum">03</span>
+                        <i class="fa-solid fa-star"></i>
+                        <h3>Get matched</h3>
+                        <p>The Shelf hands you a pick worth your time, ready to explore right away.</p>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="siteFooter">
+                <img src="the-shelf-logo-horizontal.svg" alt="" class="navLogo">
+                <span class="copyright">All rights reserved 2026</span>
+            </footer>
+        </section>
+
+        <section id="chatPage" style="display: none;">
+            <div id="chatHeader">
+                <div class="leftpch">
+                    <button id="toggleHistory" aria-label="Toggle history"><i class="fa-solid fa-bars"></i></button>
+                    <img src="the-shelf-logo-horizontal.svg" alt="The Shelf" class="navLogo">
+                </div>
+                <div class="rightpch">
+                    <button><i class="fa-solid fa-heart"></i><span class="btnLabel">Donate</span></button>
+                    <button class="signUpBtn"><i class="fa-solid fa-user-plus"></i><span class="btnLabel">Sign Up</span></button>
+                    <button><i class="fa-solid fa-right-to-bracket"></i><span class="btnLabel">Log In</span></button>
+                </div>
+            </div>
+            <div id="history">
+                <div class="historyHead">
+                    <span class="historyTitle"><i class="fa-solid fa-clock-rotate-left"></i> Recents</span>
+                    <button id="closeHistory" aria-label="Close history"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <button class="newChatBtn"><i class="fa-solid fa-plus"></i> New chat</button>
+            </div>
+            <div id="chatSpace">
+                <div id="greeting">
+                    <h1>Have an interest in mind?</h1>
+                </div>
+                <div id="inputs">
+                    <div class="recIdentifiers">
+                        <div id="catCon" class="inputCon">
+                            <label for="categoryDropdown">Category:</label>
+                            <div class="selectWrap">
+                                <select id="categoryDropdown">
+                                    <option value="music">Music</option>
+                                    <option value="movie-series">Movies & Series</option>
+                                    <option value="anime">Anime</option>
+                                    <option value="acads">Academics</option>
+                                    <option value="gaming">Gaming</option>
+                                    <option value="lifestyle">Lifestyle</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="genreCon" class="inputCon">
+                            <label>Genre:</label>
+                        </div>
+                        <div id="moodCon" class="inputCon">
+                            <label>Mood:</label>
+                        </div>
+                    </div>
+                    <div class="inputRow">
+                        <i class="fa-solid fa-wand-magic-sparkles inputIcon"></i>
+                        <textarea id="addInfo" rows="1" placeholder="Additional Info"></textarea>
+                        <button id="sendBtn" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="main.js"></script>
+    <script>
+        // Auto-grow #addInfo like a textarea as lines are added.
+        // Self-contained: doesn't require any changes to main.js.
+        document.addEventListener('DOMContentLoaded', function () {
+            var ta = document.getElementById('addInfo');
+            if (!ta) return;
+
+            var MIN_H = 50;
+            var MAX_H = 160;
+
+            function resize() {
+                ta.style.height = 'auto';
+                var next = Math.min(ta.scrollHeight, MAX_H);
+                ta.style.height = Math.max(next, MIN_H) + 'px';
+                ta.style.overflowY = ta.scrollHeight > MAX_H ? 'auto' : 'hidden';
+            }
+
+            ta.addEventListener('input', resize);
+            resize();
+
+            // Keep it in sync even if main.js sets ta.value directly (e.g. clearing after send)
+            var nativeValue = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
+            Object.defineProperty(ta, 'value', {
+                configurable: true,
+                get: function () { return nativeValue.get.call(this); },
+                set: function (v) {
+                    nativeValue.set.call(this, v);
+                    resize();
+                }
+            });
+        });
+    </script>
+    <script src="https://kit.fontawesome.com/bd70f9279c.js" crossorigin="anonymous"></script>
+</body>
+</html>

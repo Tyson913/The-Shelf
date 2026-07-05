@@ -1,0 +1,19 @@
+<svg viewBox="0 0 420 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- The Shelf — horizontal lockup -->
+  <!-- fonts: Fraunces (display/wordmark). If unavailable, falls back to Georgia/serif -->
+
+  <!-- mark -->
+  <g transform="translate(4,4) scale(0.92)">
+    <g stroke-linecap="round">
+      <rect x="21" y="38" width="10" height="40" rx="2" fill="#2b2621"/>
+      <rect x="33" y="26" width="8" height="52" rx="2" fill="#2b2621" transform="rotate(-6 37 52)"/>
+      <rect x="45" y="44" width="12" height="34" rx="2" fill="#c1613e"/>
+      <rect x="61" y="32" width="9" height="46" rx="2" fill="#2b2621" transform="rotate(4 65.5 55)"/>
+      <rect x="74" y="50" width="7" height="28" rx="2" fill="#2b2621"/>
+    </g>
+    <line x1="14" y1="80" x2="86" y2="80" stroke="#2b2621" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="128" y="76" font-family="'Fraunces', Georgia, serif" font-size="46" font-weight="500" fill="#2b2621" letter-spacing="0.5">the shelf</text>
+</svg>
