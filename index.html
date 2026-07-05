@@ -153,8 +153,6 @@
     </main>
     <script src="main.js"></script>
     <script>
-        // Auto-grow #addInfo like a textarea as lines are added.
-        // Self-contained: doesn't require any changes to main.js.
         document.addEventListener('DOMContentLoaded', function () {
             var ta = document.getElementById('addInfo');
             if (!ta) return;
@@ -172,7 +170,6 @@
             ta.addEventListener('input', resize);
             resize();
 
-            // Keep it in sync even if main.js sets ta.value directly (e.g. clearing after send)
             var nativeValue = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
             Object.defineProperty(ta, 'value', {
                 configurable: true,
