@@ -1,4 +1,4 @@
-
+import {output} from './server/gemini'
 
 const catGenreMood = {
     "music": {
@@ -32,8 +32,11 @@ const genreCon = document.getElementById("genreCon");
 const moodCon = document.getElementById("moodCon");
 
 const genreDropdown = document.createElement('select');
+genreDropdown.id = 'genreDropdown';
+
 
 const moodDropdown = document.createElement('select');
+moodDropdown.id = 'moodDropdown'
 
 genreCon.append(genreDropdown);
 moodCon.append(moodDropdown);
@@ -76,4 +79,4 @@ toggleHistoryBtn.addEventListener('click', () => {
 closeHistoryBtn.addEventListener('click', () => {
   chatPage.classList.remove('historyOpen');
   toggleHistoryBtn.style.display = "block";
-});
+});  
