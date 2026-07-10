@@ -790,3 +790,17 @@ select {
   .siteFooter nav a { font-size: 12px; }
   .siteFooter .copyright { font-size: 11px; }
 }
+
+#loginForm, #signupForm, form div {
+  display: flex;
+  flex-direction: column;
+}
+
+form {
+  margin-left: 10rem;
+  width: 300px;
+  height: 400px;
+  gap: 10px;
+}
+
+

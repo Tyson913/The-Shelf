@@ -4,10 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The Shelf — mood-based recommendations across music, movies & series, anime, academics, gaming, and lifestyle.">
+    <meta name="description"
+        content="The Shelf — mood-based recommendations across music, movies & series, anime, academics, gaming, and lifestyle.">
     <title>The Shelf — find your next favorite thing</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <main>
         <section id="landingPage">
@@ -33,7 +35,7 @@
                         <div class="statItem"><i class="fa-solid fa-face-smile"></i><span>Mood matched</span></div>
                         <div class="statItem"><i class="fa-solid fa-bolt"></i><span>Instant picks</span></div>
                     </div>
-                    <button onclick="gotoChat()" id="chatEntryBttn" class="btn btn-primary">
+                    <button id="chatEntryBttn" class="btn btn-primary">
                         Get recommendations <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
@@ -74,7 +76,8 @@
                         <span class="stepNum">01</span>
                         <i class="fa-solid fa-shapes"></i>
                         <h3>Pick a category</h3>
-                        <p>Start with what you're in the mood to do — music, a show, a game, or something new to learn.</p>
+                        <p>Start with what you're in the mood to do — music, a show, a game, or something new to learn.
+                        </p>
                     </div>
                     <div class="stepCard">
                         <span class="stepNum">02</span>
@@ -105,7 +108,8 @@
                 </div>
                 <div class="rightpch">
                     <button><i class="fa-solid fa-heart"></i><span class="btnLabel">Donate</span></button>
-                    <button class="signUpBtn"><i class="fa-solid fa-user-plus"></i><span class="btnLabel">Sign Up</span></button>
+                    <button class="signUpBtn"><i class="fa-solid fa-user-plus"></i><span class="btnLabel">Sign
+                            Up</span></button>
                     <button><i class="fa-solid fa-right-to-bracket"></i><span class="btnLabel">Log In</span></button>
                 </div>
             </div>
@@ -120,49 +124,68 @@
                 <div id="greeting">
                     <h1>Have an interest in mind?</h1>
                 </div>
-                <div id="inputs">
-                    <div class="recIdentifiers">
-                        <div id="catCon" class="inputCon">
-                            <label for="categoryDropdown">Category:</label>
-                            <div class="selectWrap">
-                                <select id="categoryDropdown">
-                                    <option value="music">Music</option>
-                                    <option value="movie-series">Movies & Series</option>
-                                    <option value="anime">Anime</option>
-                                    <option value="acads">Academics</option>
-                                    <option value="gaming">Gaming</option>
-                                    <option value="lifestyle">Lifestyle</option>
-                                </select>
+                <form action="">
+                    <div id="inputs">
+                        <div class="recIdentifiers">
+                            <div id="catCon" class="inputCon">
+                                <label for="categoryDropdown">Category:</label>
+                                <div class="selectWrap">
+                                    <select id="categoryDropdown" required>
+                                        <option value="music">Music</option>
+                                        <option value="movie-series">Movies & Series</option>
+                                        <option value="anime">Anime</option>
+                                        <option value="acads">Academics</option>
+                                        <option value="gaming">Gaming</option>
+                                        <option value="lifestyle">Lifestyle</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="genreCon" class="inputCon">
+                                <label>Genre:</label>
+                            </div>
+                            <div id="moodCon" class="inputCon">
+                                <label>Mood:</label>
                             </div>
                         </div>
-                        <div id="genreCon" class="inputCon">
-                            <label>Genre:</label>
-                        </div>
-                        <div id="moodCon" class="inputCon">
-                            <label>Mood:</label>
+                        <div class="inputRow">
+                            <i class="fa-solid fa-wand-magic-sparkles inputIcon"></i>
+                            <textarea id="addInfo" rows="1" placeholder="Additional Info"></textarea>
+                            <input type="submit" id="sendBtn" aria-label="Send"><i class="fa-solid fa-paper-plane"></i>
                         </div>
                     </div>
-                    <div class="inputRow">
-                        <i class="fa-solid fa-wand-magic-sparkles inputIcon"></i>
-                        <textarea id="addInfo" rows="1" placeholder="Additional Info"></textarea>
-                        <button id="sendBtn" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button>
-                    </div>
-                </div>
+                </form>
             </div>
         </section>
         <div>
-            <form action="">
-                <input type="text">
-                <input type="submit">
+            <form action="" id="signupForm">
+                <div>
+                    <label for="">Email:</label>
+                    <input type="text">
+                </div>
+                <div>
+                    <label for="">Password:</label>
+                    <input type="text">
+                </div>
+                <div>
+                    <label for="">Confirm Password:</label>
+                    <input type="text">
+                </div>
+                <input type="submit" value="Signup">
             </form>
-            <form action="">
-                <input type="text">
-                <input type="submit">
+            <form action="" id="loginForm">
+                <div>
+                    <label for="">Email:</label>
+                    <input type="text">
+                </div>
+                <div>
+                    <label for="">Password:</label>
+                    <input type="text">
+                </div>
+                <input type="submit" value="Login">
             </form>
         </div>
-
     </main>
-    <script src="main.js"></script>
+    <script src="main.js" type="module"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var ta = document.getElementById('addInfo');
@@ -192,8 +215,8 @@
             });
         });
     </script>
-    <script src="server/generateImage.js" type="module"></script>
-    <script src="server/gemini.js" type="module"></script>
+    <script type="module" src="server/generateImage.js"></script>
+    <script type="module" src="server/gemini.js"></script>
     <script src="https://kit.fontawesome.com/bd70f9279c.js" crossorigin="anonymous"></script>
 </body>
 </html>

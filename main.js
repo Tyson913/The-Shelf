@@ -1,4 +1,6 @@
-import {output} from './server/gemini'
+
+import {output} from './server/gemini.js'
+import {urls} from './server/generateImage.js'
 
 const catGenreMood = {
     "music": {
@@ -62,11 +64,12 @@ categoryDropdown.addEventListener('change', updateGenreMood);
 
 const landingPage = document.getElementById("landingPage");
 const chatPage = document.getElementById("chatPage");
+const chatEntryBttn = document.getElementById("chatEntryBttn");
 
-function gotoChat(){
+chatEntryBttn.addEventListener('click', (e) => {
     landingPage.style.display = 'none';
     chatPage.style.display = 'block';
-}
+})
 
 const toggleHistoryBtn = document.getElementById('toggleHistory');
 const closeHistoryBtn = document.getElementById('closeHistory');
@@ -80,3 +83,33 @@ closeHistoryBtn.addEventListener('click', () => {
   chatPage.classList.remove('historyOpen');
   toggleHistoryBtn.style.display = "block";
 });  
+
+urls.forEach(element => {
+    const image = document.createElement('img');
+    const link = document.createElement('a');
+    link.href = element;
+    link.appendChild(img);
+});
+
+
+
+/*
+
+TODO:
+
+get the official urls from generateImage.js
+access the image
+
+AI response format:
+
+image
+info
+
+image
+info
+
+
+image
+info
+
+*/
