@@ -95,8 +95,6 @@ function aiChatActions() {
     const aiResImageContainer = document.createElement('div');
     aiResImageCon.id = 'aiResImageCon';
 
-    const aiResDesContainer = document.createElement('div');
-    aiResDesCon.id = 'aiResDesCon';
 
     let image;
 
@@ -114,6 +112,9 @@ function aiChatActions() {
     for (let i = 0; i < output.recommendations.length; i++) {
         const aiTextContainer = document.createElement('div');
         aiTextContainer.classList = 'aiTextContainer';
+
+        const aiResDesContainer = document.createElement('div');
+        aiResDesCon.id = 'aiResDesCon';
 
         title = output.recommendations[i].title;
         description = output.recommendations[i].description;
@@ -156,4 +157,5 @@ form.addEventListener('submit', function (e) {
     const mood = document.getElementById("moodDropdown").value;
     const genre = document.getElementById("genreDropdown").value;
     const additionalInfo = document.getElementById("addInfo").value;
+
 });
