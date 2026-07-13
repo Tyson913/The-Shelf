@@ -14,17 +14,17 @@ async function getMusicImageUrls() {
     });
 
 
-    urls.forEach(url => {
-        let res = await fetch(url);
-        let data = await res.json();
+    for (const url of urls){
+        const res = await fetch(url);
+        const data = await res.json();
         let imageUrl = data.results[0].artworkUrl100;
         imageUrls.push(imageUrl);
-    });
+    };
 
     return imageUrls;
 }
 
-async function getAnimeImagesUrls() {
+async function getAnimeImageUrls() {
     const urls = [];
     const imageUrls = [];
 
@@ -34,17 +34,17 @@ async function getAnimeImagesUrls() {
     });
 
 
-    urls.forEach(url => {
-        let res = await fetch(url);
-        let data = await res.json();
+    for (const url of urls){
+        const res = await fetch(url);
+        const data = await res.json();
         let imageUrl = data.data[0].images.jpg.large_image_url;
         imageUrls.push(imageUrl);
-    });
+    };
 
     return imageUrls;
 }
 
-async function getMovieImagesUrls() {
+async function getMovieImageUrls() {
     const urls = [];
     const imageUrls = []
     const key = process.env.TMDKey;
@@ -54,15 +54,15 @@ async function getMovieImagesUrls() {
         urls.push(url);
     });
 
-    urls.forEach(url => {
-        let res = await fetch(url);
-        let data = await res.json();
+    for (const url of urls) {
+        const res = await fetch(url);
+        const data = await res.json();
         let imageUrl = `https://image.tmdb.org/t/p/original${data.poster_path}`;
-    });
+        imageUrls.push(imageUrl);
+    };
 
     return imageUrls;
 }
-
 
 async function getAcadsImageUrls() {
     const urls = [];
@@ -73,13 +73,13 @@ async function getAcadsImageUrls() {
         urls.push(url);
     });
 
-    urls.forEach(url => {
-        let res = await fetch(url);
-        let data = await res.json();
-        let page = Object.values(data.query.pages)[0];
+    for (const url of urls) {
+        const res = await fetch(url);
+        const data = await res.json();
+        const page = Object.values(data.query.pages)[0];
         let imageUrl = page.original.source;
         imageUrls.push(imageUrl);
-    });
+    };
     return imageUrls;
 }
 
@@ -93,16 +93,15 @@ async function getGameImageUrls() {
         urls.push(url);
     });
 
-    urls.forEach(url => {
-        let res = await fetch(url);
-        let data = await res.json();
+    for (const url of urls) {
+        const res = await fetch(url);
+        const data = await res.json();
         let imageUrl = data.results[0].background_image;
         imageUrls.push(imageUrl);
-    });
+    };
     return imageUrls;
 
 }
-
 
 async function getLifestyleImageUrls() {
     const key = process.env.pexel;
@@ -114,34 +113,34 @@ async function getLifestyleImageUrls() {
         urls.push(url);
     });
 
-    urls.forEach(url => {
-        let res = await fetch(url);
-        let data = await res.json();
+    for (const url of urls) {
+        const res = await fetch(url);
+        const data = await res.json();
         let imageUrl = data.photos[0].src.original
         imageUrls.push(imageUrl);
-    });
+    };
 
     return imageUrls;
 }
 
 
 function getUrls() {
-    let urls = [];
     switch (category) {
         case 'music':
-            urls = getMusicImageUrls();
+            return getMusicImageUrls();
         case 'movie-series':
-            urls = getMovieImageUrls();
+            return getMovieImageUrls();
         case 'anime':
-            urls = getAnimeImageUrls();
+            return getAnimeImageUrls();
         case 'acads':
-            urls = getAcadsImageUrls();
+            return getAcadsImageUrls();
         case 'gaming':
-            urls = getGameImageUrls();
+            return getGameImageUrls();
         case 'lifestyle':
-            urls = getLifestyleImageUrls();
+            return getLifestyleImageUrls();
+        default:
+            return [];
     }
-    return urls;
 }
 
 export const urls = getUrls();

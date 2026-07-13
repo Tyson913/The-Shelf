@@ -2,24 +2,19 @@ import 'dotenv/config';
 
 import { GoogleGenAI } from "@google/genai";
 
-const category = document.getElementById('categoryDropdown').value;
-const mood = document.getElementById('moodDropdown').value;
-const genre = document.getElementById('genreDropdown').value;
-const additionalInfo = document.getElementById('addInfo').value;
-
 const gemini = process.env.GEMINI_KEY;
 const ai = new GoogleGenAI({ apiKey: gemini });
 
-async function main() {
+export async function getRecommendations(preferences) {
   const interaction = await ai.interactions.create({
     model: "gemini-3.5-pro",
     input: `
     Based on the user's preferences, generate *5 personalized recommendations*.
     User Preferences:
-    - Category: ${category}
-    - Genre: ${genre}
-    - Mood: ${mood}
-    - Additional Information: ${addInfo}
+    - Category: ${preferences.category}
+    - Genre: ${preferences.genre}
+    - Mood: ${preferences.mood}
+    - Additional Information: ${preferences.additionalInfo}
 
     Requirements:
     1. Recommend exactly *5 items* that best match the user's preferences.
@@ -64,7 +59,6 @@ async function main() {
     }
     `,
   });
-  export const output = interaction.output_text; 
-}
+  return interaction.output_text; 
 
-main();
+}

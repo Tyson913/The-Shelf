@@ -1,5 +1,4 @@
 
-import { output } from './server/gemini.js'
 import { urls } from './server/generateImage.js'
 
 const catGenreMood = {
@@ -84,6 +83,20 @@ closeHistoryBtn.addEventListener('click', () => {
     toggleHistoryBtn.style.display = "block";
 });
 
+const response = await fetch("http://localhost:3000/api/recommendations", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        category,
+        genre,
+        mood,
+        additionalInfo
+    })
+});
+
+const data = await response.json();
 
 function aiChatActions() {
     const userReqContainer = document.createElement('div');
@@ -94,8 +107,6 @@ function aiChatActions() {
 
     const aiResImageContainer = document.createElement('div');
     aiResImageCon.id = 'aiResImageCon';
-
-
     let image;
 
     urls.forEach(element => {
