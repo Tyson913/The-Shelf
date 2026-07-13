@@ -153,9 +153,10 @@ function aiChatActions() {
 const form = document.getElementById("inputsForm");
 
 form.addEventListener('submit', function (e) {
-    const category = document.getElementById("categoryDropdown").value;
+    /*const category = document.getElementById("categoryDropdown").value;
     const mood = document.getElementById("moodDropdown").value;
     const genre = document.getElementById("genreDropdown").value;
     const additionalInfo = document.getElementById("addInfo").value;
-
+    */
+    aiChatActions();
 });
