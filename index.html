@@ -16,8 +16,8 @@
             <header class="siteNav">
                 <img src="the-shelf-logo-horizontal.svg" alt="The Shelf" class="navLogo">
                 <div class="authCon">
-                    <button class="btn btn-ghost">Log In</button>
-                    <button class="btn btn-primary">Sign Up</button>
+                    <button class="btn btn-ghost" data-auth="login">Log In</button>
+                    <button class="btn btn-primary" data-auth="signup">Sign Up</button>
                 </div>
             </header>
 
@@ -108,9 +108,9 @@
                 </div>
                 <div class="rightpch">
                     <button><i class="fa-solid fa-heart"></i><span class="btnLabel">Donate</span></button>
-                    <button class="signUpBtn"><i class="fa-solid fa-user-plus"></i><span class="btnLabel">Sign
+                    <button class="signUpBtn" data-auth="signup"><i class="fa-solid fa-user-plus"></i><span class="btnLabel">Sign
                             Up</span></button>
-                    <button><i class="fa-solid fa-right-to-bracket"></i><span class="btnLabel">Log In</span></button>
+                    <button data-auth="login"><i class="fa-solid fa-right-to-bracket"></i><span class="btnLabel">Log In</span></button>
                 </div>
             </div>
             <div id="history">
@@ -124,7 +124,7 @@
                 <div id="greeting">
                     <h1>Have an interest in mind?</h1>
                 </div>
-                <form action="">
+                <form action="" id="inputsForm">
                     <div id="inputs">
                         <div class="recIdentifiers">
                             <div id="catCon" class="inputCon">
@@ -156,33 +156,108 @@
                 </form>
             </div>
         </section>
-        <div>
-            <form action="" id="signupForm">
-                <div>
-                    <label for="">Email:</label>
-                    <input type="text">
-                </div>
-                <div>
-                    <label for="">Password:</label>
-                    <input type="text">
-                </div>
-                <div>
-                    <label for="">Confirm Password:</label>
-                    <input type="text">
-                </div>
-                <input type="submit" value="Signup">
-            </form>
-            <form action="" id="loginForm">
-                <div>
-                    <label for="">Email:</label>
-                    <input type="text">
-                </div>
-                <div>
-                    <label for="">Password:</label>
-                    <input type="text">
-                </div>
-                <input type="submit" value="Login">
-            </form>
+
+        <div class="authOverlay" id="authOverlay" aria-hidden="true">
+            <div class="authCard" role="dialog" aria-modal="true" aria-labelledby="authCardTitle">
+                <button type="button" class="authClose btn-icon" id="authClose" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <form action="" id="signupForm" class="authForm" nonvalidate>
+                    <div class="authHead">
+                        <span class="eyebrow"><i class="fa-solid fa-feather"></i> Create your shelf</span>
+                        <h1 id="authCardTitle">Sign Up</h1>
+                        <p>Unlimited recommendations via AI chat, plus saved picks and cover art.</p>
+                    </div>
+
+                    <div class="authField">
+                        <label for="signupEmail">Email</label>
+                        <div class="authInputWrap">
+                            <i class="fa-solid fa-envelope"></i>
+                            <input type="email" id="signupEmail" name="email" placeholder="you@example.com"
+                                autocomplete="email" required>
+                        </div>
+                    </div>
+
+                    <div class="authField">
+                        <label for="signupPassword">Password</label>
+                        <div class="authInputWrap">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="signupPassword" name="password"
+                                placeholder="At least 8 characters" autocomplete="new-password" minlength="8"
+                                required>
+                            <button type="button" class="authToggleVis" aria-label="Show password"
+                                aria-pressed="false">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="authField">
+                        <label for="signupConfirm">Confirm Password</label>
+                        <div class="authInputWrap">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="signupConfirm" name="confirmPassword"
+                                placeholder="Re-enter password" autocomplete="new-password" minlength="8" required>
+                            <button type="button" class="authToggleVis" aria-label="Show password"
+                                aria-pressed="false">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary authSubmit">
+                        Sign Up <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                    <p class="authSwitch">Already have a shelf?
+                        <button type="button" class="authSwitchBtn" data-switch-to="loginForm">Log in</button>
+                    </p>
+                </form>
+
+                <form action="" id="loginForm" class="authForm" style="display: none;" nonvalidate>
+                    <div class="authHead">
+                        <span class="eyebrow"><i class="fa-solid fa-book-open-reader"></i> Welcome back</span>
+                        <h1>Log In</h1>
+                        <p>Pick up right where you left off.</p>
+                    </div>
+
+                    <div class="authField">
+                        <label for="loginEmail">Email</label>
+                        <div class="authInputWrap">
+                            <i class="fa-solid fa-envelope"></i>
+                            <input type="email" id="loginEmail" name="email" placeholder="you@example.com"
+                                autocomplete="email" required>
+                        </div>
+                    </div>
+
+                    <div class="authField">
+                        <label for="loginPassword">Password</label>
+                        <div class="authInputWrap">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="loginPassword" name="password" placeholder="Your password"
+                                autocomplete="current-password" required>
+                            <button type="button" class="authToggleVis" aria-label="Show password"
+                                aria-pressed="false">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="authRow">
+                        <label class="authCheck"><input type="checkbox" name="remember"> Remember me</label>
+                        <a href="#" class="authForgot">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary authSubmit">
+                        Log In <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                    <p class="authSwitch">New to The Shelf?
+                        <button type="button" class="authSwitchBtn" data-switch-to="signupForm">Sign up</button>
+                    </p>
+                </form>
+            </div>
         </div>
     </main>
     <script src="main.js" type="module"></script>
@@ -212,6 +287,76 @@
                     nativeValue.set.call(this, v);
                     resize();
                 }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var overlay = document.getElementById('authOverlay');
+            var closeBtn = document.getElementById('authClose');
+            var forms = {
+                signupForm: document.getElementById('signupForm'),
+                loginForm: document.getElementById('loginForm')
+            };
+            var lastFocused = null;
+
+            function showForm(name) {
+                Object.keys(forms).forEach(function (key) {
+                    forms[key].style.display = key === name ? 'flex' : 'none';
+                });
+            }
+
+            function openAuth(name) {
+                lastFocused = document.activeElement;
+                showForm(name || 'signupForm');
+                overlay.classList.add('isOpen');
+                overlay.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+                var firstInput = forms[name || 'signupForm'].querySelector('input');
+                if (firstInput) firstInput.focus();
+            }
+
+            function closeAuth() {
+                overlay.classList.remove('isOpen');
+                overlay.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+                if (lastFocused) lastFocused.focus();
+            }
+
+            document.querySelectorAll('[data-auth]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    openAuth(btn.dataset.auth === 'login' ? 'loginForm' : 'signupForm');
+                });
+            });
+
+            document.querySelectorAll('[data-switch-to]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var target = btn.dataset.switchTo;
+                    showForm(target);
+                    var firstInput = forms[target].querySelector('input');
+                    if (firstInput) firstInput.focus();
+                });
+            });
+
+            closeBtn.addEventListener('click', closeAuth);
+            overlay.addEventListener('click', function (e) {
+                if (e.target === overlay) closeAuth();
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && overlay.classList.contains('isOpen')) closeAuth();
+            });
+
+            document.querySelectorAll('.authToggleVis').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var input = btn.previousElementSibling;
+                    var icon = btn.querySelector('i');
+                    var willShow = input.type === 'password';
+                    input.type = willShow ? 'text' : 'password';
+                    btn.setAttribute('aria-pressed', String(willShow));
+                    btn.setAttribute('aria-label', willShow ? 'Hide password' : 'Show password');
+                    icon.classList.toggle('fa-eye', !willShow);
+                    icon.classList.toggle('fa-eye-slash', willShow);
+                });
             });
         });
     </script>

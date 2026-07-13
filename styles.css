@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap');
 
@@ -42,6 +41,10 @@ body {
   padding: 0;
   margin: 0;
   -webkit-font-smoothing: antialiased;
+}
+
+main {
+  position: relative;
 }
 
 img { max-width: 100%; display: block; }
@@ -791,16 +794,231 @@ select {
   .siteFooter .copyright { font-size: 11px; }
 }
 
-#loginForm, #signupForm, form div {
+/* ==========================================================================
+   Auth modal
+   ========================================================================== */
+
+.authOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  background: rgba(33, 31, 27, 0.55);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s var(--ease), visibility 0.25s var(--ease);
+}
+
+.authOverlay.isOpen {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.authCard {
+  position: relative;
+  width: min(408px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 44px 36px 34px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transform: translateY(18px) scale(0.96);
+  opacity: 0;
+  transition: transform 0.32s var(--ease), opacity 0.28s var(--ease);
+}
+
+.authOverlay.isOpen .authCard {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.authClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.authForm {
   display: flex;
   flex-direction: column;
 }
 
-form {
-  margin-left: 10rem;
-  width: 300px;
-  height: 400px;
-  gap: 10px;
+.authHead {
+  text-align: center;
+  margin-bottom: 28px;
 }
 
+.authHead .eyebrow {
+  justify-content: center;
+  width: 100%;
+}
 
+.authHead h1 {
+  font-size: 30px;
+  margin: 6px 0 10px;
+}
+
+.authHead p {
+  font-size: 13.5px;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.authField {
+  margin-bottom: 18px;
+}
+
+.authField label {
+  display: block;
+  margin-bottom: 7px;
+}
+
+.authInputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.authInputWrap > i:first-child {
+  position: absolute;
+  left: 16px;
+  color: var(--slate-light);
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.authInputWrap input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 16px 13px 42px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  outline: transparent;
+  transition: border-color 0.18s var(--ease), background 0.18s var(--ease);
+}
+
+.authInputWrap input::placeholder {
+  color: var(--slate-light);
+}
+
+.authInputWrap input:focus {
+  border-color: var(--ember);
+  background: var(--surface);
+}
+
+.authInputWrap:has(.authToggleVis) input {
+  padding-right: 44px;
+}
+
+.authToggleVis {
+  position: absolute;
+  right: 6px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--slate-light);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s var(--ease), background 0.15s var(--ease);
+}
+
+.authToggleVis:hover {
+  color: var(--ember-dark);
+  background: var(--ember-soft);
+}
+
+.authRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  font-size: 12.5px;
+}
+
+.authCheck {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--slate);
+  font-weight: 600;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.authCheck input {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--ember);
+}
+
+.authForgot {
+  color: var(--slate);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.authForgot:hover {
+  color: var(--ember);
+}
+
+.authSubmit {
+  width: 100%;
+  margin-top: 6px;
+  padding: 13px 20px;
+  font-size: 14.5px;
+}
+
+.authSwitch {
+  text-align: center;
+  margin: 20px 0 0;
+  font-size: 13px;
+  color: var(--slate);
+}
+
+.authSwitchBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  color: var(--ember);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s var(--ease);
+}
+
+.authSwitchBtn:hover {
+  text-decoration-color: var(--ember);
+}
+
+@media (max-width: 480px) {
+  .authCard {
+    padding: 34px 22px 26px;
+    border-radius: var(--radius-md);
+  }
+
+  .authHead h1 {
+    font-size: 25px;
+  }
+}

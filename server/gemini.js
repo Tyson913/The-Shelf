@@ -26,8 +26,8 @@ async function main() {
     2. Consider all provided preferences when ranking the recommendations.
     3. If some preferences are missing, make reasonable assumptions based on the available information.
     4. For each recommendation, provide:
-      - Title
-      - Brief explanation (1–2 sentences) describing why it matches the user's preferences.
+      - Title (Must start with a space)
+      - Brief explanation (1–2 sentences) describing why it matches the user's preferences. (Must start with a space)
       - imageSearchText: A concise search query that can be used to find a representative image of the recommendation. Must written in lowercase.
     5. Return *only valid JSON* with no markdown, comments, or additional text.
 

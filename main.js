@@ -1,6 +1,6 @@
 
-import {output} from './server/gemini.js'
-import {urls} from './server/generateImage.js'
+import { output } from './server/gemini.js'
+import { urls } from './server/generateImage.js'
 
 const catGenreMood = {
     "music": {
@@ -75,41 +75,85 @@ const toggleHistoryBtn = document.getElementById('toggleHistory');
 const closeHistoryBtn = document.getElementById('closeHistory');
 
 toggleHistoryBtn.addEventListener('click', () => {
-  chatPage.classList.toggle('historyOpen');
-  toggleHistoryBtn.style.display = 'none';
+    chatPage.classList.toggle('historyOpen');
+    toggleHistoryBtn.style.display = 'none';
 });
 
 closeHistoryBtn.addEventListener('click', () => {
-  chatPage.classList.remove('historyOpen');
-  toggleHistoryBtn.style.display = "block";
-});  
-
-urls.forEach(element => {
-    const image = document.createElement('img');
-    const link = document.createElement('a');
-    link.href = element;
-    link.appendChild(img);
+    chatPage.classList.remove('historyOpen');
+    toggleHistoryBtn.style.display = "block";
 });
 
 
+function aiChatActions() {
+    const userReqContainer = document.createElement('div');
+    userReqCon.id = 'userReqCon';
 
-/*
+    const aiResponseContainer = document.createElement('div');
+    aiResponseCon.id = 'aiResponseCon';
 
-TODO:
+    const aiResImageContainer = document.createElement('div');
+    aiResImageCon.id = 'aiResImageCon';
 
-get the official urls from generateImage.js
-access the image
+    const aiResDesContainer = document.createElement('div');
+    aiResDesCon.id = 'aiResDesCon';
 
-AI response format:
+    let image;
 
-image
-info
+    urls.forEach(element => {
+        image = document.createElement('img');
+        image.src = element;
+    });
 
-image
-info
+    aiResImageCon.append(image);
+    aiResponseCon.append(aiResImageCon);
 
+    let title = "";
+    let description = "";
 
-image
-info
+    for (let i = 0; i < output.recommendations.length; i++) {
+        const aiTextContainer = document.createElement('div');
+        aiTextContainer.classList = 'aiTextContainer';
 
-*/
+        title = output.recommendations[i].title;
+        description = output.recommendations[i].description;
+
+        let ttext = "";
+        let titleCharacterCount = 0;
+
+        const titleInterval = setInterval(() => {
+            if (titleCharacterCount < title.length) {
+                ttext += title[titleCharacterCount];
+                aiTextContainer.textContent = ttext;
+                titleCharacterCount++;
+            }
+            else {
+                clearInterval(titleInterval);
+            }
+        }, 500)
+
+        let dtext = "";
+        let descriptionCharacterCount = 0;
+
+        aiTextContainer.append(aiResDesCon);
+        const descriptionInterval = setInterval(() => {
+            if (descriptionCharacterCount < description.length) {
+                dtext += description[descriptionCharacterCount];
+                document.getElementById("aiResDesCon").textContent = dtext;
+                descriptionCharacterCount++;
+            }
+            else {
+                clearInterval(descriptionInterval);
+            }
+        }, 500)
+    }
+}
+
+const form = document.getElementById("inputsForm");
+
+form.addEventListener('submit', function (e) {
+    const category = document.getElementById("categoryDropdown").value;
+    const mood = document.getElementById("moodDropdown").value;
+    const genre = document.getElementById("genreDropdown").value;
+    const additionalInfo = document.getElementById("addInfo").value;
+});
