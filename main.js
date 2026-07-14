@@ -1,6 +1,4 @@
 
-import { urls } from './server/generateImage.js'
-
 const catGenreMood = {
     "music": {
         "genre": ["Pop", "Rock", "Hip-Hop", "R&B", "Jazz", "Classical", "EDM", "Country", "Indie", "Lo-fi"],
@@ -27,7 +25,6 @@ const catGenreMood = {
         "mood": ["Healthy", "Motivated", "Relaxed", "Adventurous", "Mindful", "Minimalist", "Luxury", "Cozy", "Productive", "Inspired"]
     }
 };
-
 const categoryDropdown = document.getElementById("categoryDropdown");
 const genreCon = document.getElementById("genreCon");
 const moodCon = document.getElementById("moodCon");
@@ -83,30 +80,16 @@ closeHistoryBtn.addEventListener('click', () => {
     toggleHistoryBtn.style.display = "block";
 });
 
-const response = await fetch("http://localhost:3000/api/recommendations", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-        category,
-        genre,
-        mood,
-        additionalInfo
-    })
-});
 
-const data = await response.json();
-
-function aiChatActions() {
+function aiChatActions(output, urls) {
     const userReqContainer = document.createElement('div');
-    userReqCon.id = 'userReqCon';
+    userReqContainer.id = 'userReqCon';
 
     const aiResponseContainer = document.createElement('div');
-    aiResponseCon.id = 'aiResponseCon';
+    aiResponseContainer.id = 'aiResponseCon';
 
     const aiResImageContainer = document.createElement('div');
-    aiResImageCon.id = 'aiResImageCon';
+    aiResImageContainer.id = 'aiResImageCon';
     let image;
 
     urls.forEach(element => {
@@ -114,8 +97,8 @@ function aiChatActions() {
         image.src = element;
     });
 
-    aiResImageCon.append(image);
-    aiResponseCon.append(aiResImageCon);
+    aiResImageContainer.append(image);
+    aiResponseContainer.append(aiResImageCon);
 
     let title = "";
     let description = "";
@@ -125,7 +108,7 @@ function aiChatActions() {
         aiTextContainer.classList = 'aiTextContainer';
 
         const aiResDesContainer = document.createElement('div');
-        aiResDesCon.id = 'aiResDesCon';
+        aiResDesContainer.id = 'aiResDesCon';
 
         title = output.recommendations[i].title;
         description = output.recommendations[i].description;
@@ -163,11 +146,32 @@ function aiChatActions() {
 
 const form = document.getElementById("inputsForm");
 
-form.addEventListener('submit', function (e) {
-    /*const category = document.getElementById("categoryDropdown").value;
+form.addEventListener('submit', async function (e) {
+    const category = document.getElementById("categoryDropdown").value;
     const mood = document.getElementById("moodDropdown").value;
     const genre = document.getElementById("genreDropdown").value;
     const additionalInfo = document.getElementById("addInfo").value;
-    */
-    aiChatActions();
+
+    const response = await fetch("http://localhost:3000/api/recommendations", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            category,
+            genre,
+            mood,
+            additionalInfo
+        })
+    });
+
+    const urls = await fetch("http://localhost:3000/api/images", {
+    method: "GET",
+    headers: {
+        "Content-Type": "application/json"
+    }
+    });
+    const data = await response.json();
+    const imageUrls = await urls.json(); 
+    aiChatActions(data, imageUrls);
 });

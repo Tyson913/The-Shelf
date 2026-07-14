@@ -60,5 +60,4 @@ export async function getRecommendations(preferences) {
     `,
   });
   return interaction.output_text; 
-
 }

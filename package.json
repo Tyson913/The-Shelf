@@ -8,6 +8,7 @@
     "react-dom": "^19.2.7"
   },
   "scripts": {
-    "start": "node server.js"
-  }
+    "start": "node C:/LAB/WEB/The-Shelf/server/server.js"
+  },
+  "type": "module"
 }

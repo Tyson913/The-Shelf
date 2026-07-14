@@ -57,7 +57,7 @@ async function getMovieImageUrls() {
     for (const url of urls) {
         const res = await fetch(url);
         const data = await res.json();
-        let imageUrl = `https://image.tmdb.org/t/p/original${data.poster_path}`;
+        let imageUrl = `https://image.tmdb.org/t/p/original${data.results[0].poster_path}`;
         imageUrls.push(imageUrl);
     };
 
@@ -124,7 +124,7 @@ async function getLifestyleImageUrls() {
 }
 
 
-function getUrls() {
+export function getUrls() {
     switch (category) {
         case 'music':
             return getMusicImageUrls();
@@ -143,7 +143,7 @@ function getUrls() {
     }
 }
 
-export const urls = getUrls();
+
 
 
 // will return image urls
