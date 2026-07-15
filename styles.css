@@ -1022,3 +1022,7 @@ select {
     font-size: 25px;
   }
 }
+
+#addInfo::placeholder {
+  white-space: nowrap;
+}

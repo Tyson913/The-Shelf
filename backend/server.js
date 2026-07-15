@@ -3,10 +3,10 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import { getRecommendations } from "./gemini.js";
-import { getUrls } from "./getImageUrls.js" ;
+import { getUrls } from "./getImageUrls.js";
+import { supabase } from "./db.js";
 
 const app = express();
-const connectDB = require("./db.js");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,16 +16,19 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "..")));
 
-connectDB();
-
+supabase;
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "..", "index.html"));
 });
 
 app.post("/api/recommendations", async (req, res) => {
     try {
-        const output = JSON.parse(await getRecommendations(req.body));
-        const imageUrls = JSON.parse(await getUrls(output));
+        const { category, genre, mood, additionalInfo } = req.body;
+
+        const output = JSON.parse(await getRecommendations(category, genre, mood, additionalInfo));
+        const imageUrls = await getUrls(category, output);
+        console.log("category received:", category);
+        console.log("imageUrls returned:", imageUrls);
 
         output.recommendations = output.recommendations.map((recommendation, index) => ({
             title: recommendation.title,
@@ -37,7 +40,7 @@ app.post("/api/recommendations", async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({
-            error: "Failed to generate recommendations"
+            error: "Failed to generate recommendations", details: error.message,
         });
     }
 });

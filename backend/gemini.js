@@ -5,16 +5,16 @@ import { GoogleGenAI } from "@google/genai";
 const gemini = process.env.GEMINI_KEY;
 const ai = new GoogleGenAI({ apiKey: gemini });
 
-export async function getRecommendations(preferences) {
+export async function getRecommendations(category, genre, mood, additionalInfo) {
   const interaction = await ai.interactions.create({
-    model: "gemini-3.5-pro",
+    model: "gemini-3.5-flash",
     input: `
     Based on the user's preferences, generate *5 personalized recommendations*.
     User Preferences:
-    - Category: ${preferences.category}
-    - Genre: ${preferences.genre}
-    - Mood: ${preferences.mood}
-    - Additional Information: ${preferences.additionalInfo}
+    - Category: ${category}
+    - Genre: ${genre}
+    - Mood: ${mood}
+    - Additional Information: ${additionalInfo}
 
     Requirements:
     1. Recommend exactly *5 items* that best match the user's preferences.
@@ -59,6 +59,7 @@ export async function getRecommendations(preferences) {
     }
     `,
   });
+  console.log("FULL INTERACTION:", JSON.stringify(interaction, null, 2));
   return interaction.output_text; 
 }
 

@@ -135,7 +135,7 @@ function aiChatActions(output, urls) {
         let dtext = "";
         let descriptionCharacterCount = 0;
 
-        aiTextContainer.append(aiResDesCon);
+        aiTextContainer.append(aiResDesContainer);
         const descriptionInterval = setInterval(() => {
             if (descriptionCharacterCount < description.length) {
                 dtext += description[descriptionCharacterCount];
@@ -157,21 +157,27 @@ form.addEventListener('submit', async function (e) {
     const mood = document.getElementById("moodDropdown").value;
     const genre = document.getElementById("genreDropdown").value;
     const additionalInfo = document.getElementById("addInfo").value;
-
-    const response = await fetch("http://localhost:3000/api/recommendations", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            category,
-            genre,
-            mood,
-            additionalInfo
-        })
-    });
-
-    const data = await response.json();
-    const imageUrls = data.recommendations.map(recommendation => recommendation.imageUrl);
-    aiChatActions(data, imageUrls);
+    try {
+        const response = await fetch("http://localhost:3000/api/recommendations", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                category,
+                genre,
+                mood,
+                additionalInfo
+            })
+        });
+        if (!response.ok) {
+            // This catches 400 or 500 errors
+            throw new Error(`Server error: ${response.status}`);
+        }
+        const data = await response.json();
+        const imageUrls = data.recommendations.map(recommendation => recommendation.imageUrl);
+        aiChatActions(data, imageUrls);
+    } catch (error) {
+        console.error("Failed to fetch recommendations:", error);
+    }
 });

@@ -1,7 +1,5 @@
 import 'dotenv/config';
 
-const category = document.getElementById("categoryDropdown").value;
-
 async function getMusicImageUrls(output) {
     const imageSearchTexts = output.recommendations.map(recommendation => recommendation.imageSearchText);
     const urls = [];
@@ -113,12 +111,13 @@ async function getLifestyleImageUrls(output) {
     const imageUrls = [];
 
     imageSearchTexts.forEach(element => {
-        let url = `https://api.pexels.com/v1/search?query=${element}= Authorization:${key}`;
+        let url = `https://api.pexels.com/v1/search?query=${element}`;
         urls.push(url);
     });
 
     for (const url of urls) {
-        const res = await fetch(url);
+        const res = await fetch(url, { headers: {Authorization: key }
+        });
         const data = await res.json();
         let imageUrl = data.photos[0].src.original
         imageUrls.push(imageUrl);
@@ -128,7 +127,7 @@ async function getLifestyleImageUrls(output) {
 
 
 export function getUrls(category, output) {
-    switch (category) {
+    switch (category.toLowerCase()) {
         case 'music':
             return getMusicImageUrls(output);
         case 'movie-series':
