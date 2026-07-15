@@ -1,4 +1,3 @@
-
 const catGenreMood = {
     "music": {
         "genre": ["Pop", "Rock", "Hip-Hop", "R&B", "Jazz", "Classical", "EDM", "Country", "Indie", "Lo-fi"],
@@ -83,22 +82,28 @@ closeHistoryBtn.addEventListener('click', () => {
 
 function aiChatActions(output, urls) {
     const userReqContainer = document.createElement('div');
-    userReqContainer.id = 'userReqCon';
+    userReqContainer.id = 'userReqContainer';
+    chatPage.append(userReqContainer);
+
 
     const aiResponseContainer = document.createElement('div');
-    aiResponseContainer.id = 'aiResponseCon';
+    aiResponseContainer.id = 'aiResponseContainer';
+
+    chatPage.append(aiResponseContainer);
 
     const aiResImageContainer = document.createElement('div');
-    aiResImageContainer.id = 'aiResImageCon';
+    aiResImageContainer.className = 'aiResImageContainer';
+
+    chatPage.append(aiResImageContainer);
     let image;
 
     urls.forEach(element => {
         image = document.createElement('img');
         image.src = element;
+        aiResImageContainer.append(image);
     });
 
-    aiResImageContainer.append(image);
-    aiResponseContainer.append(aiResImageCon);
+    aiResponseContainer.append(aiResImageContainer);
 
     let title = "";
     let description = "";
@@ -108,7 +113,7 @@ function aiChatActions(output, urls) {
         aiTextContainer.classList = 'aiTextContainer';
 
         const aiResDesContainer = document.createElement('div');
-        aiResDesContainer.id = 'aiResDesCon';
+        aiResDesContainer.id = 'aiResDesContainer';
 
         title = output.recommendations[i].title;
         description = output.recommendations[i].description;
@@ -134,7 +139,7 @@ function aiChatActions(output, urls) {
         const descriptionInterval = setInterval(() => {
             if (descriptionCharacterCount < description.length) {
                 dtext += description[descriptionCharacterCount];
-                document.getElementById("aiResDesCon").textContent = dtext;
+                aiResDesContainer.textContent = dtext;
                 descriptionCharacterCount++;
             }
             else {
@@ -147,6 +152,7 @@ function aiChatActions(output, urls) {
 const form = document.getElementById("inputsForm");
 
 form.addEventListener('submit', async function (e) {
+    e.preventDefault();
     const category = document.getElementById("categoryDropdown").value;
     const mood = document.getElementById("moodDropdown").value;
     const genre = document.getElementById("genreDropdown").value;
@@ -165,13 +171,7 @@ form.addEventListener('submit', async function (e) {
         })
     });
 
-    const urls = await fetch("http://localhost:3000/api/images", {
-    method: "GET",
-    headers: {
-        "Content-Type": "application/json"
-    }
-    });
     const data = await response.json();
-    const imageUrls = await urls.json(); 
+    const imageUrls = data.recommendations.map(recommendation => recommendation.imageUrl);
     aiChatActions(data, imageUrls);
 });

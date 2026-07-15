@@ -5,7 +5,6 @@ import { fileURLToPath } from "url";
 import { getRecommendations } from "./gemini.js";
 import { getUrls } from "./getImageUrls.js" ;
 
-
 const app = express();
 const connectDB = require("./db.js");
 
@@ -23,22 +22,18 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "..", "index.html"));
 });
 
-app.get("/api/images", async (req, res) => {
-    try {
-        const images = await getUrls();
-        res.json(JSON.parse(images));
-    } catch {
-        console.error(error);
-        res.status(500).json({
-            error: "Failed to load images"
-        });
-    }
-});
-
 app.post("/api/recommendations", async (req, res) => {
     try {
-        const result = await getRecommendations(req.body);
-        res.json(JSON.parse(result));
+        const output = JSON.parse(await getRecommendations(req.body));
+        const imageUrls = JSON.parse(await getUrls(output));
+
+        output.recommendations = output.recommendations.map((recommendation, index) => ({
+            title: recommendation.title,
+            description: recommendation.description,
+            imageUrl: imageUrls[index]
+        }));
+        res.json(output);
+
     } catch (error) {
         console.error(error);
         res.status(500).json({

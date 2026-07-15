@@ -1,10 +1,9 @@
 import 'dotenv/config';
-import { output } from './gemini.js';
 
-const imageSearchTexts = output.recommendations.map(recommendation => recommendation.imageSearchText);
 const category = document.getElementById("categoryDropdown").value;
 
-async function getMusicImageUrls() {
+async function getMusicImageUrls(output) {
+    const imageSearchTexts = output.recommendations.map(recommendation => recommendation.imageSearchText);
     const urls = [];
     const imageUrls = [];
 
@@ -24,7 +23,8 @@ async function getMusicImageUrls() {
     return imageUrls;
 }
 
-async function getAnimeImageUrls() {
+async function getAnimeImageUrls(output) {
+    const imageSearchTexts = output.recommendations.map(recommendation => recommendation.imageSearchText);
     const urls = [];
     const imageUrls = [];
 
@@ -44,9 +44,10 @@ async function getAnimeImageUrls() {
     return imageUrls;
 }
 
-async function getMovieImageUrls() {
+async function getMovieImageUrls(output) {
+    const imageSearchTexts = output.recommendations.map(recommendation => recommendation.imageSearchText);
     const urls = [];
-    const imageUrls = []
+    const imageUrls = [];
     const key = process.env.TMDKey;
 
     imageSearchTexts.forEach(element => {
@@ -64,7 +65,8 @@ async function getMovieImageUrls() {
     return imageUrls;
 }
 
-async function getAcadsImageUrls() {
+async function getAcadsImageUrls(output) {
+    const imageSearchTexts = output.recommendations.map(recommendation => recommendation.imageSearchText);
     const urls = [];
     const imageUrls = [];
 
@@ -83,7 +85,8 @@ async function getAcadsImageUrls() {
     return imageUrls;
 }
 
-async function getGameImageUrls() {
+async function getGameImageUrls(output) {
+    const imageSearchTexts = output.recommendations.map(recommendation => recommendation.imageSearchText);
     const key = process.env.Rawg;
     const urls = [];
     const imageUrls = [];
@@ -103,7 +106,8 @@ async function getGameImageUrls() {
 
 }
 
-async function getLifestyleImageUrls() {
+async function getLifestyleImageUrls(output) {
+    const imageSearchTexts = output.recommendations.map(recommendation => recommendation.imageSearchText);
     const key = process.env.pexel;
     const urls = [];
     const imageUrls = [];
@@ -119,25 +123,24 @@ async function getLifestyleImageUrls() {
         let imageUrl = data.photos[0].src.original
         imageUrls.push(imageUrl);
     };
-
     return imageUrls;
 }
 
 
-export function getUrls() {
+export function getUrls(category, output) {
     switch (category) {
         case 'music':
-            return getMusicImageUrls();
+            return getMusicImageUrls(output);
         case 'movie-series':
-            return getMovieImageUrls();
+            return getMovieImageUrls(output);
         case 'anime':
-            return getAnimeImageUrls();
+            return getAnimeImageUrls(output);
         case 'acads':
-            return getAcadsImageUrls();
+            return getAcadsImageUrls(output);
         case 'gaming':
-            return getGameImageUrls();
+            return getGameImageUrls(output);
         case 'lifestyle':
-            return getLifestyleImageUrls();
+            return getLifestyleImageUrls(output);
         default:
             return [];
     }
