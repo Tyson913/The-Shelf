@@ -144,10 +144,6 @@ export function getUrls(category, output) {
             return [];
     }
 }
-
-
-
-
 // will return image urls
 // 
 

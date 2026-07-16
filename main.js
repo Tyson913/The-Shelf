@@ -60,6 +60,8 @@ categoryDropdown.addEventListener('change', updateGenreMood);
 const landingPage = document.getElementById("landingPage");
 const chatPage = document.getElementById("chatPage");
 const chatEntryBttn = document.getElementById("chatEntryBttn");
+const chatSpace = document.getElementById("chatSpace");
+const messagesArea = document.getElementById("messagesArea");
 
 chatEntryBttn.addEventListener('click', (e) => {
     landingPage.style.display = 'none';
@@ -80,21 +82,40 @@ closeHistoryBtn.addEventListener('click', () => {
 });
 
 
-function aiChatActions(output, urls) {
+function aiChatActions(output, urls, query) {
+    chatSpace.classList.add('hasMessages');
+
     const userReqContainer = document.createElement('div');
-    userReqContainer.id = 'userReqContainer';
-    chatPage.append(userReqContainer);
+    userReqContainer.className = 'userReqContainer';
+
+    const reqTags = document.createElement('div');
+    reqTags.className = 'reqTags';
+    [query.categoryLabel, query.genre, query.mood].forEach(text => {
+        const tag = document.createElement('span');
+        tag.className = 'reqTag';
+        tag.textContent = text;
+        reqTags.append(tag);
+    });
+    userReqContainer.append(reqTags);
+
+    if (query.additionalInfo) {
+        const reqNote = document.createElement('p');
+        reqNote.className = 'reqNote';
+        reqNote.textContent = query.additionalInfo;
+        userReqContainer.append(reqNote);
+    }
+
+    messagesArea.append(userReqContainer);
 
 
     const aiResponseContainer = document.createElement('div');
-    aiResponseContainer.id = 'aiResponseContainer';
+    aiResponseContainer.className = 'aiResponseContainer';
 
-    chatPage.append(aiResponseContainer);
+    messagesArea.append(aiResponseContainer);
 
     const aiResImageContainer = document.createElement('div');
     aiResImageContainer.className = 'aiResImageContainer';
 
-    chatPage.append(aiResImageContainer);
     let image;
 
     urls.forEach(element => {
@@ -110,13 +131,24 @@ function aiChatActions(output, urls) {
 
     for (let i = 0; i < output.recommendations.length; i++) {
         const aiTextContainer = document.createElement('div');
-        aiTextContainer.classList = 'aiTextContainer';
+        aiTextContainer.className = 'aiTextContainer';
+
+        const aiResTitleContainer = document.createElement('div');
+        aiResTitleContainer.className = 'aiResTitleContainer';
 
         const aiResDesContainer = document.createElement('div');
-        aiResDesContainer.id = 'aiResDesContainer';
+        aiResDesContainer.className = 'aiResDesContainer';
+
+        const copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'copyBtn';
+        copyBtn.setAttribute('aria-label', 'Copy response');
+        copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i>';
 
         title = output.recommendations[i].title;
         description = output.recommendations[i].description;
+
+        aiTextContainer.append(aiResTitleContainer);
 
         let ttext = "";
         let titleCharacterCount = 0;
@@ -124,13 +156,13 @@ function aiChatActions(output, urls) {
         const titleInterval = setInterval(() => {
             if (titleCharacterCount < title.length) {
                 ttext += title[titleCharacterCount];
-                aiTextContainer.textContent = ttext;
+                aiResTitleContainer.textContent = ttext;
                 titleCharacterCount++;
             }
             else {
                 clearInterval(titleInterval);
             }
-        }, 500)
+        }, 5000)
 
         let dtext = "";
         let descriptionCharacterCount = 0;
@@ -145,8 +177,24 @@ function aiChatActions(output, urls) {
             else {
                 clearInterval(descriptionInterval);
             }
-        }, 500)
+        }, 5000)
+
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(`${title}\n\n${description}`).then(() => {
+                copyBtn.classList.add('copied');
+                copyBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                setTimeout(() => {
+                    copyBtn.classList.remove('copied');
+                    copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i>';
+                }, 1500);
+            });
+        });
+
+        aiTextContainer.append(copyBtn);
+        aiResponseContainer.append(aiTextContainer);
     }
+
+    messagesArea.scrollTop = messagesArea.scrollHeight;
 }
 
 const form = document.getElementById("inputsForm");
@@ -154,6 +202,7 @@ const form = document.getElementById("inputsForm");
 form.addEventListener('submit', async function (e) {
     e.preventDefault();
     const category = document.getElementById("categoryDropdown").value;
+    const categoryLabel = categoryDropdown.options[categoryDropdown.selectedIndex].text;
     const mood = document.getElementById("moodDropdown").value;
     const genre = document.getElementById("genreDropdown").value;
     const additionalInfo = document.getElementById("addInfo").value;
@@ -171,12 +220,13 @@ form.addEventListener('submit', async function (e) {
             })
         });
         if (!response.ok) {
-            // This catches 400 or 500 errors
+
             throw new Error(`Server error: ${response.status}`);
         }
         const data = await response.json();
         const imageUrls = data.recommendations.map(recommendation => recommendation.imageUrl);
-        aiChatActions(data, imageUrls);
+        aiChatActions(data, imageUrls, { categoryLabel, genre, mood, additionalInfo });
+        document.getElementById("addInfo").value = "";
     } catch (error) {
         console.error("Failed to fetch recommendations:", error);
     }

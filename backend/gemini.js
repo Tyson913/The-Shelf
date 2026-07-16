@@ -59,7 +59,6 @@ export async function getRecommendations(category, genre, mood, additionalInfo) 
     }
     `,
   });
-  console.log("FULL INTERACTION:", JSON.stringify(interaction, null, 2));
   return interaction.output_text; 
 }
 
