@@ -81,119 +81,71 @@ closeHistoryBtn.addEventListener('click', () => {
     toggleHistoryBtn.style.display = "block";
 });
 
-
 function aiChatActions(output, urls, query) {
-    chatSpace.classList.add('hasMessages');
+    function typeText(element, text, speed) {
+        return new Promise(resolve => {
+            let index = 0;
+
+            const interval = setInterval(() => {
+                if (index < text.length) {
+                    element.textContent += text[index++];
+                } else {
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, speed);
+        })
+    }
 
     const userReqContainer = document.createElement('div');
     userReqContainer.className = 'userReqContainer';
+    document.body.appendChild(userReqContainer);
 
-    const reqTags = document.createElement('div');
-    reqTags.className = 'reqTags';
-    [query.categoryLabel, query.genre, query.mood].forEach(text => {
-        const tag = document.createElement('span');
-        tag.className = 'reqTag';
-        tag.textContent = text;
-        reqTags.append(tag);
-    });
-    userReqContainer.append(reqTags);
+    const categoryLabel = document.createElement('label');
+    categoryLabel.textContent = 'Category:'
 
-    if (query.additionalInfo) {
-        const reqNote = document.createElement('p');
-        reqNote.className = 'reqNote';
-        reqNote.textContent = query.additionalInfo;
-        userReqContainer.append(reqNote);
-    }
+    const categoryText = document.createElement('p');
+    categoryText.textContent = query.category;
 
-    messagesArea.append(userReqContainer);
+    const genreLabel = document.createElement('label');
+    genreLabel.textContent = 'Genre:'
 
+    const genreText = document.createElement('p');
+    categoryText.textContent = query.genre;
+
+    const moodLabel = document.createElement('label');
+    moodLabel.textContent = 'Mood:'
+
+    const moodText = document.createElement('p');
+    moodText.textContent = query.mood;
+
+    const additionalInfoLabel = document.createElement('label');
+    additionalInfoLabel.textContent = 'Additional Information:'
+
+    const additionalInfoText = document.createElement('p');
+    additionalInfoText.textContent = query.additionalInfo;
 
     const aiResponseContainer = document.createElement('div');
     aiResponseContainer.className = 'aiResponseContainer';
+    document.body.appendChild(aiResponseContainer);
 
-    messagesArea.append(aiResponseContainer);
+    async function displayRecommendations() {
+        for (const recommendation of output.recommendations) {
 
-    const aiResImageContainer = document.createElement('div');
-    aiResImageContainer.className = 'aiResImageContainer';
+            const textContainer = document.createElement("div");
+            textContainer.className = "textContainer";
 
-    let image;
+            const titleSpace = document.createElement("h4");
+            const descriptionSpace = document.createElement("p");
 
-    urls.forEach(element => {
-        image = document.createElement('img');
-        image.src = element;
-        aiResImageContainer.append(image);
-    });
+            textContainer.append(titleSpace, descriptionSpace);
+            aiResponseContainer.appendChild(textContainer);
 
-    aiResponseContainer.append(aiResImageContainer);
-
-    let title = "";
-    let description = "";
-
-    for (let i = 0; i < output.recommendations.length; i++) {
-        const aiTextContainer = document.createElement('div');
-        aiTextContainer.className = 'aiTextContainer';
-
-        const aiResTitleContainer = document.createElement('div');
-        aiResTitleContainer.className = 'aiResTitleContainer';
-
-        const aiResDesContainer = document.createElement('div');
-        aiResDesContainer.className = 'aiResDesContainer';
-
-        const copyBtn = document.createElement('button');
-        copyBtn.type = 'button';
-        copyBtn.className = 'copyBtn';
-        copyBtn.setAttribute('aria-label', 'Copy response');
-        copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i>';
-
-        title = output.recommendations[i].title;
-        description = output.recommendations[i].description;
-
-        aiTextContainer.append(aiResTitleContainer);
-
-        let ttext = "";
-        let titleCharacterCount = 0;
-
-        const titleInterval = setInterval(() => {
-            if (titleCharacterCount < title.length) {
-                ttext += title[titleCharacterCount];
-                aiResTitleContainer.textContent = ttext;
-                titleCharacterCount++;
-            }
-            else {
-                clearInterval(titleInterval);
-            }
-        }, 5000)
-
-        let dtext = "";
-        let descriptionCharacterCount = 0;
-
-        aiTextContainer.append(aiResDesContainer);
-        const descriptionInterval = setInterval(() => {
-            if (descriptionCharacterCount < description.length) {
-                dtext += description[descriptionCharacterCount];
-                aiResDesContainer.textContent = dtext;
-                descriptionCharacterCount++;
-            }
-            else {
-                clearInterval(descriptionInterval);
-            }
-        }, 5000)
-
-        copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(`${title}\n\n${description}`).then(() => {
-                copyBtn.classList.add('copied');
-                copyBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
-                setTimeout(() => {
-                    copyBtn.classList.remove('copied');
-                    copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i>';
-                }, 1500);
-            });
-        });
-
-        aiTextContainer.append(copyBtn);
-        aiResponseContainer.append(aiTextContainer);
+            await typeText(titleSpace, recommendation.title, 50);
+            await typeText(descriptionSpace, recommendation.description, 50);
+        }
     }
-
+    displayRecommendations();
     messagesArea.scrollTop = messagesArea.scrollHeight;
 }
 
@@ -218,6 +170,7 @@ form.addEventListener('submit', async function (e) {
                 mood,
                 additionalInfo
             })
+
         });
         if (!response.ok) {
 
