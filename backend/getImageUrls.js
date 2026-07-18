@@ -6,7 +6,7 @@ async function getMusicImageUrls(output) {
     const imageUrls = [];
 
     imageSearchTexts.forEach(element => {
-        let url = `https://itunes.apple.com/search?term=${element}`;
+        let url = `https://itunes.apple.com/search?term=${encodeURIComponent(element)}&limit=1`;
         urls.push(url);
     });
 
@@ -14,7 +14,7 @@ async function getMusicImageUrls(output) {
     for (const url of urls){
         const res = await fetch(url);
         const data = await res.json();
-        let imageUrl = data.results[0].artworkUrl100;
+        let imageUrl = data.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
         imageUrls.push(imageUrl);
     };
 
@@ -27,7 +27,7 @@ async function getAnimeImageUrls(output) {
     const imageUrls = [];
 
     imageSearchTexts.forEach(searchText => {
-        let url = `https://api.jikan.moe/v4/anime?q=${searchText}`;
+        let url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(searchText)}&limit=1`;
         urls.push(url);
     });
 
@@ -49,14 +49,14 @@ async function getMovieImageUrls(output) {
     const key = process.env.TMDKey;
 
     imageSearchTexts.forEach(element => {
-        let url = `https://api.themoviedb.org/3/search/movie?query=${element}&api_key=${key}`;
+        let url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(element)}&api_key=${key}`;
         urls.push(url);
     });
 
     for (const url of urls) {
         const res = await fetch(url);
         const data = await res.json();
-        let imageUrl = `https://image.tmdb.org/t/p/original${data.results[0].poster_path}`;
+        let imageUrl = `https://image.tmdb.org/t/p/w780${data.results[0].poster_path}`;
         imageUrls.push(imageUrl);
     };
 
@@ -69,7 +69,7 @@ async function getAcadsImageUrls(output) {
     const imageUrls = [];
 
     imageSearchTexts.forEach(element => {
-        let url = `https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=original&titles=${element}&format=json`;
+        let url = `https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=600&titles=${encodeURIComponent(element)}&format=json`;
         urls.push(url);
     });
 
@@ -77,7 +77,7 @@ async function getAcadsImageUrls(output) {
         const res = await fetch(url);
         const data = await res.json();
         const page = Object.values(data.query.pages)[0];
-        let imageUrl = page.original.source;
+        let imageUrl = page.thumbnail.source;
         imageUrls.push(imageUrl);
     };
     return imageUrls;
@@ -90,7 +90,7 @@ async function getGameImageUrls(output) {
     const imageUrls = [];
 
     imageSearchTexts.forEach(element => {
-        let url = `https://api.rawg.io/api/games?search=${element}&key=${key}`
+        let url = `https://api.rawg.io/api/games?search=${encodeURIComponent(element)}&key=${key}`
         urls.push(url);
     });
 
@@ -111,7 +111,7 @@ async function getLifestyleImageUrls(output) {
     const imageUrls = [];
 
     imageSearchTexts.forEach(element => {
-        let url = `https://api.pexels.com/v1/search?query=${element}`;
+        let url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(element)}&per_page=1`;
         urls.push(url);
     });
 
@@ -119,7 +119,7 @@ async function getLifestyleImageUrls(output) {
         const res = await fetch(url, { headers: {Authorization: key }
         });
         const data = await res.json();
-        let imageUrl = data.photos[0].src.original
+        let imageUrl = data.photos[0].src.large2x
         imageUrls.push(imageUrl);
     };
     return imageUrls;
@@ -145,5 +145,4 @@ export function getUrls(category, output) {
     }
 }
 // will return image urls
-// 
-
+//

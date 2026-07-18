@@ -81,72 +81,86 @@ closeHistoryBtn.addEventListener('click', () => {
     toggleHistoryBtn.style.display = "block";
 });
 
-function aiChatActions(output, urls, query) {
-    function typeText(element, text, speed) {
-        return new Promise(resolve => {
-            let index = 0;
+function typeText(element, text, speed) {
+    return new Promise(resolve => {
+        let index = 0;
 
-            const interval = setInterval(() => {
-                if (index < text.length) {
-                    element.textContent += text[index++];
-                } else {
-                    clearInterval(interval);
-                    resolve();
-                }
-            }, speed);
-        })
-    }
+        const interval = setInterval(() => {
+            if (index < text.length) {
+                element.textContent += text[index++];
+            } else {
+                clearInterval(interval);
+                resolve();
+            }
+        }, speed);
+    })
+}
 
+function renderUserRequest(query) {
     const userReqContainer = document.createElement('div');
     userReqContainer.className = 'userReqContainer';
-    document.body.appendChild(userReqContainer);
+    messagesArea.appendChild(userReqContainer);
 
-    const categoryLabel = document.createElement('label');
-    categoryLabel.textContent = 'Category:'
+    const reqTags = document.createElement('div');
+    reqTags.className = 'reqTags';
 
-    const categoryText = document.createElement('p');
-    categoryText.textContent = query.category;
+    [query.categoryLabel, query.genre, query.mood].forEach(value => {
+        if (!value) return;
+        const tag = document.createElement('span');
+        tag.className = 'reqTag';
+        tag.textContent = value;
+        reqTags.appendChild(tag);
+    });
 
-    const genreLabel = document.createElement('label');
-    genreLabel.textContent = 'Genre:'
+    userReqContainer.appendChild(reqTags);
 
-    const genreText = document.createElement('p');
-    categoryText.textContent = query.genre;
-
-    const moodLabel = document.createElement('label');
-    moodLabel.textContent = 'Mood:'
-
-    const moodText = document.createElement('p');
-    moodText.textContent = query.mood;
-
-    const additionalInfoLabel = document.createElement('label');
-    additionalInfoLabel.textContent = 'Additional Information:'
-
-    const additionalInfoText = document.createElement('p');
-    additionalInfoText.textContent = query.additionalInfo;
-
-    const aiResponseContainer = document.createElement('div');
-    aiResponseContainer.className = 'aiResponseContainer';
-    document.body.appendChild(aiResponseContainer);
-
-    async function displayRecommendations() {
-        for (const recommendation of output.recommendations) {
-
-            const textContainer = document.createElement("div");
-            textContainer.className = "textContainer";
-
-            const titleSpace = document.createElement("h4");
-            const descriptionSpace = document.createElement("p");
-
-            textContainer.append(titleSpace, descriptionSpace);
-            aiResponseContainer.appendChild(textContainer);
-
-            await typeText(titleSpace, recommendation.title, 50);
-            await typeText(descriptionSpace, recommendation.description, 50);
-        }
+    if (query.additionalInfo && query.additionalInfo.trim()) {
+        const reqNote = document.createElement('p');
+        reqNote.className = 'reqNote';
+        reqNote.textContent = query.additionalInfo;
+        userReqContainer.appendChild(reqNote);
     }
-    displayRecommendations();
-    messagesArea.scrollTop = messagesArea.scrollHeight;
+}
+
+async function displayRecommendations(aiResponseContainer, output) {
+    let index = 0;
+    for (const recommendation of output.recommendations) {
+        index++;
+
+        const recCard = document.createElement("div");
+        recCard.className = "recCard";
+
+        const recIndex = document.createElement("span");
+        recIndex.className = "recIndex";
+        recIndex.textContent = String(index).padStart(2, "0");
+
+        const recImgWrap = document.createElement("div");
+        recImgWrap.className = "recImgWrap";
+
+        const recImg = document.createElement("img");
+        recImg.className = "recImg";
+        recImg.src = recommendation.imageUrl;
+        recImg.alt = recommendation.title;
+        recImg.loading = "lazy";
+        recImgWrap.appendChild(recImg);
+
+        const recBody = document.createElement("div");
+        recBody.className = "recBody";
+
+        const recTitle = document.createElement("h4");
+        recTitle.className = "recTitle";
+
+        const recDesc = document.createElement("p");
+        recDesc.className = "recDesc";
+
+        recBody.append(recTitle, recDesc);
+        recCard.append(recIndex, recImgWrap, recBody);
+        aiResponseContainer.appendChild(recCard);
+
+        await typeText(recTitle, recommendation.title, 50);
+        await typeText(recDesc, recommendation.description, 50);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
 }
 
 const form = document.getElementById("inputsForm");
@@ -158,6 +172,19 @@ form.addEventListener('submit', async function (e) {
     const mood = document.getElementById("moodDropdown").value;
     const genre = document.getElementById("genreDropdown").value;
     const additionalInfo = document.getElementById("addInfo").value;
+
+    renderUserRequest({ categoryLabel, genre, mood, additionalInfo });
+    document.getElementById("addInfo").value = "";
+
+    const aiResponseContainer = document.createElement('div');
+    aiResponseContainer.className = 'aiResponseContainer';
+    messagesArea.appendChild(aiResponseContainer);
+
+    const streamingText = document.createElement('p');
+    streamingText.className = 'streamingText';
+    aiResponseContainer.appendChild(streamingText);
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+
     try {
         const response = await fetch("http://localhost:3000/api/recommendations", {
             method: "POST",
@@ -170,16 +197,40 @@ form.addEventListener('submit', async function (e) {
                 mood,
                 additionalInfo
             })
-
         });
         if (!response.ok) {
-
             throw new Error(`Server error: ${response.status}`);
         }
-        const data = await response.json();
-        const imageUrls = data.recommendations.map(recommendation => recommendation.imageUrl);
-        aiChatActions(data, imageUrls, { categoryLabel, genre, mood, additionalInfo });
-        document.getElementById("addInfo").value = "";
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        while (true) { 
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const parts = buffer.split("\n\n");
+            buffer = parts.pop();
+
+            for (const part of parts) {
+                if (!part) continue;
+                const [eventLine, dataLine] = part.split("\n");
+                const eventType = eventLine.replace("event: ", "");
+                const data = JSON.parse(dataLine.replace("data: ", ""));
+
+                if (eventType === "chunk") {
+                    streamingText.textContent += data.text;
+                    messagesArea.scrollTop = messagesArea.scrollHeight;
+                } else if (eventType === "done") {
+                    streamingText.remove();
+                    await displayRecommendations(aiResponseContainer, data);
+                } else if (eventType === "error") {
+                    streamingText.textContent = "Something went wrong: " + data.details;
+                }
+            }
+        }
     } catch (error) {
         console.error("Failed to fetch recommendations:", error);
     }

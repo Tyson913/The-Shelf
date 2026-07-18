@@ -25,7 +25,22 @@ app.post("/api/recommendations", async (req, res) => {
     try {
         const { category, genre, mood, additionalInfo } = req.body;
 
-        const output = JSON.parse(await getRecommendations(category, genre, mood, additionalInfo));
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+
+        const stream = await getRecommendations(category, genre, mood, additionalInfo);
+
+        let fullText = "";
+        for await (const chunk of stream) {
+            const piece = chunk.text || "";
+            fullText += piece;
+            res.write(`event: chunk\ndata: ${JSON.stringify({ text: piece })}\n\n`);
+        }
+
+        const cleaned = fullText.replace(/```json|```/g, "").trim();
+        const output = JSON.parse(cleaned);
+
         const imageUrls = await getUrls(category, output);
         console.log("category received:", category);
         console.log("imageUrls returned:", imageUrls);
@@ -35,13 +50,14 @@ app.post("/api/recommendations", async (req, res) => {
             description: recommendation.description,
             imageUrl: imageUrls[index]
         }));
-        res.json(output);
 
+        res.write(`event: done\ndata: ${JSON.stringify(output)}\n\n`);
+        res.end();
+        
     } catch (error) {
         console.error(error);
-        res.status(500).json({
-            error: "Failed to generate recommendations", details: error.message,
-        });
+        res.write(`event: error\ndata: ${JSON.stringify({ error: "Failed to generate recommendations", details: error.message })}\n\n`);
+        res.end();
     }
 });
 

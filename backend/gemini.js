@@ -6,9 +6,9 @@ const gemini = process.env.GEMINI_KEY;
 const ai = new GoogleGenAI({ apiKey: gemini });
 
 export async function getRecommendations(category, genre, mood, additionalInfo) {
-  const interaction = await ai.interactions.create({
+  const result = await ai.models.generateContentStream({
     model: "gemini-3.5-flash",
-    input: `
+    contents: `
     Based on the user's preferences, generate *5 personalized recommendations*.
     User Preferences:
     - Category: ${category}
@@ -59,6 +59,6 @@ export async function getRecommendations(category, genre, mood, additionalInfo) 
     }
     `,
   });
-  return interaction.output_text; 
+  return result; 
 }
 
