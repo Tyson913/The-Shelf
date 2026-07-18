@@ -206,29 +206,58 @@ form.addEventListener('submit', async function (e) {
         const decoder = new TextDecoder();
         let buffer = "";
 
-        while (true) { 
+        async function handleEvent(part) {
+            if (!part || !part.trim()) return;
+
+            const lines = part.split("\n").map(l => l.trim()).filter(Boolean);
+            const eventLine = lines.find(l => l.startsWith("event:"));
+            const dataLine = lines.find(l => l.startsWith("data:"));
+            if (!eventLine || !dataLine) return;
+
+            const eventType = eventLine.replace("event:", "").trim();
+            let data;
+            try {
+                data = JSON.parse(dataLine.replace("data:", "").trim());
+            } catch (parseErr) {
+                console.error("Failed to parse SSE data:", dataLine, parseErr);
+                return;
+            }
+
+            if (eventType === "chunk") {
+                streamingText.textContent += data.text;
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+            } else if (eventType === "done") {
+                streamingText.remove();
+                await displayRecommendations(aiResponseContainer, data);
+            } else if (eventType === "error") {
+                streamingText.textContent = "Something went wrong: " + data.details;
+            }
+        }
+
+        while (true) {
             const { done, value } = await reader.read();
-            if (done) break;
+
+            if (done) {
+                // Flush the decoder and process whatever is left in the buffer.
+                // Without this, a final event that isn't followed by a trailing
+                // blank line (very common when the server closes the stream
+                // right after writing it) gets silently discarded.
+                buffer += decoder.decode();
+                if (buffer.trim()) {
+                    const leftoverParts = buffer.split("\n\n");
+                    for (const part of leftoverParts) {
+                        await handleEvent(part);
+                    }
+                }
+                break;
+            }
 
             buffer += decoder.decode(value, { stream: true });
             const parts = buffer.split("\n\n");
             buffer = parts.pop();
 
             for (const part of parts) {
-                if (!part) continue;
-                const [eventLine, dataLine] = part.split("\n");
-                const eventType = eventLine.replace("event: ", "");
-                const data = JSON.parse(dataLine.replace("data: ", ""));
-
-                if (eventType === "chunk") {
-                    streamingText.textContent += data.text;
-                    messagesArea.scrollTop = messagesArea.scrollHeight;
-                } else if (eventType === "done") {
-                    streamingText.remove();
-                    await displayRecommendations(aiResponseContainer, data);
-                } else if (eventType === "error") {
-                    streamingText.textContent = "Something went wrong: " + data.details;
-                }
+                await handleEvent(part);
             }
         }
     } catch (error) {
