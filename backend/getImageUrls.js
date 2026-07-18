@@ -1,5 +1,7 @@
 import 'dotenv/config';
 
+const FALLBACK_IMAGE = null; 
+
 async function getMusicImageUrls(output) {
     const imageSearchTexts = output.recommendations.map(recommendation => recommendation.imageSearchText);
     const urls = [];
@@ -14,7 +16,13 @@ async function getMusicImageUrls(output) {
     for (const url of urls){
         const res = await fetch(url);
         const data = await res.json();
-        let imageUrl = data.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
+        const result = data.results && data.results[0];
+        if (!result) {
+            console.warn(`No music result for query: ${url}`);
+            imageUrls.push(FALLBACK_IMAGE);
+            continue;
+        }
+        let imageUrl = result.artworkUrl100.replace('100x100bb', '600x600bb');
         imageUrls.push(imageUrl);
     };
 
@@ -35,7 +43,13 @@ async function getAnimeImageUrls(output) {
     for (const url of urls){
         const res = await fetch(url);
         const data = await res.json();
-        let imageUrl = data.data[0].images.jpg.large_image_url;
+        const result = data.data && data.data[0];
+        if (!result) {
+            console.warn(`No anime result for query: ${url}`);
+            imageUrls.push(FALLBACK_IMAGE);
+            continue;
+        }
+        let imageUrl = result.images.jpg.large_image_url;
         imageUrls.push(imageUrl);
     };
 
@@ -56,7 +70,13 @@ async function getMovieImageUrls(output) {
     for (const url of urls) {
         const res = await fetch(url);
         const data = await res.json();
-        let imageUrl = `https://image.tmdb.org/t/p/w780${data.results[0].poster_path}`;
+        const result = data.results && data.results[0];
+        if (!result || !result.poster_path) {
+            console.warn(`No movie result/poster for query: ${url}`);
+            imageUrls.push(FALLBACK_IMAGE);
+            continue;
+        }
+        let imageUrl = `https://image.tmdb.org/t/p/w780${result.poster_path}`;
         imageUrls.push(imageUrl);
     };
 
@@ -76,7 +96,12 @@ async function getAcadsImageUrls(output) {
     for (const url of urls) {
         const res = await fetch(url);
         const data = await res.json();
-        const page = Object.values(data.query.pages)[0];
+        const page = data.query && Object.values(data.query.pages)[0];
+        if (!page || !page.thumbnail) {
+            console.warn(`No wiki thumbnail for query: ${url}`);
+            imageUrls.push(FALLBACK_IMAGE);
+            continue;
+        }
         let imageUrl = page.thumbnail.source;
         imageUrls.push(imageUrl);
     };
@@ -97,7 +122,13 @@ async function getGameImageUrls(output) {
     for (const url of urls) {
         const res = await fetch(url);
         const data = await res.json();
-        let imageUrl = data.results[0].background_image;
+        const result = data.results && data.results[0];
+        if (!result) {
+            console.warn(`No game result for query: ${url}`);
+            imageUrls.push(FALLBACK_IMAGE);
+            continue;
+        }
+        let imageUrl = result.background_image;
         imageUrls.push(imageUrl);
     };
     return imageUrls;
@@ -119,7 +150,13 @@ async function getLifestyleImageUrls(output) {
         const res = await fetch(url, { headers: {Authorization: key }
         });
         const data = await res.json();
-        let imageUrl = data.photos[0].src.large2x
+        const result = data.photos && data.photos[0];
+        if (!result) {
+            console.warn(`No lifestyle photo for query: ${url}`);
+            imageUrls.push(FALLBACK_IMAGE);
+            continue;
+        }
+        let imageUrl = result.src.large2x;
         imageUrls.push(imageUrl);
     };
     return imageUrls;
@@ -144,5 +181,3 @@ export function getUrls(category, output) {
             return [];
     }
 }
-// will return image urls
-//
