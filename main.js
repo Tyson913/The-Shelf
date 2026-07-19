@@ -66,6 +66,7 @@ const messagesArea = document.getElementById("messagesArea");
 chatEntryBttn.addEventListener('click', (e) => {
     landingPage.style.display = 'none';
     chatPage.style.display = 'block';
+    document.body.classList.add('chatPageActive');
 })
 
 const toggleHistoryBtn = document.getElementById('toggleHistory');
@@ -122,6 +123,89 @@ function renderUserRequest(query) {
     }
 }
 
+function createSkeletonLoader() {
+    const skeleton = document.createElement('div');
+    skeleton.className = 'recSkeleton';
+
+    for (let i = 0; i < 3; i++) {
+        const skelCard = document.createElement('div');
+        skelCard.className = 'skelCard';
+
+        const skelImg = document.createElement('div');
+        skelImg.className = 'skelImg';
+
+        const skelBody = document.createElement('div');
+        skelBody.className = 'skelBody';
+
+        const skelTitle = document.createElement('div');
+        skelTitle.className = 'skelLine skelLine-title';
+
+        const skelLine1 = document.createElement('div');
+        skelLine1.className = 'skelLine';
+
+        const skelLine2 = document.createElement('div');
+        skelLine2.className = 'skelLine skelLine-short';
+
+        skelBody.append(skelTitle, skelLine1, skelLine2);
+        skelCard.append(skelImg, skelBody);
+        skeleton.appendChild(skelCard);
+    }
+
+    return skeleton;
+}
+
+function ensureLightbox() {
+    let lightbox = document.getElementById('imgLightbox');
+    if (lightbox) return lightbox;
+
+    lightbox = document.createElement('div');
+    lightbox.id = 'imgLightbox';
+    lightbox.className = 'imgLightbox';
+    lightbox.setAttribute('aria-hidden', 'true');
+
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'lightboxClose';
+    closeBtn.setAttribute('aria-label', 'Close');
+    closeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+
+    const lightboxImg = document.createElement('img');
+    lightboxImg.className = 'lightboxImg';
+    lightboxImg.alt = '';
+
+    lightbox.append(closeBtn, lightboxImg);
+    document.body.appendChild(lightbox);
+
+    closeBtn.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightbox.classList.contains('isOpen')) closeLightbox();
+    });
+
+    return lightbox;
+}
+
+function openLightbox(src, alt) {
+    if (!src) return;
+    const lightbox = ensureLightbox();
+    const img = lightbox.querySelector('.lightboxImg');
+    img.src = src;
+    img.alt = alt || '';
+    lightbox.classList.add('isOpen');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    const lightbox = document.getElementById('imgLightbox');
+    if (!lightbox) return;
+    lightbox.classList.remove('isOpen');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+}
+
 async function displayRecommendations(aiResponseContainer, output) {
     let index = 0;
     for (const recommendation of output.recommendations) {
@@ -142,6 +226,7 @@ async function displayRecommendations(aiResponseContainer, output) {
         recImg.src = recommendation.imageUrl;
         recImg.alt = recommendation.title;
         recImg.loading = "lazy";
+        recImg.addEventListener('click', () => openLightbox(recommendation.imageUrl, recommendation.title));
         recImgWrap.appendChild(recImg);
 
         const recBody = document.createElement("div");
@@ -157,8 +242,8 @@ async function displayRecommendations(aiResponseContainer, output) {
         recCard.append(recIndex, recImgWrap, recBody);
         aiResponseContainer.appendChild(recCard);
 
-        await typeText(recTitle, recommendation.title, 50);
-        await typeText(recDesc, recommendation.description, 50);
+        await typeText(recTitle, recommendation.title, 80);
+        await typeText(recDesc, recommendation.description, 80);
         messagesArea.scrollTop = messagesArea.scrollHeight;
     }
 }
@@ -173,6 +258,8 @@ form.addEventListener('submit', async function (e) {
     const genre = document.getElementById("genreDropdown").value;
     const additionalInfo = document.getElementById("addInfo").value;
 
+    chatSpace.classList.add("hasMessages");
+
     renderUserRequest({ categoryLabel, genre, mood, additionalInfo });
     document.getElementById("addInfo").value = "";
 
@@ -180,9 +267,8 @@ form.addEventListener('submit', async function (e) {
     aiResponseContainer.className = 'aiResponseContainer';
     messagesArea.appendChild(aiResponseContainer);
 
-    const streamingText = document.createElement('p');
-    streamingText.className = 'streamingText';
-    aiResponseContainer.appendChild(streamingText);
+    const skeletonLoader = createSkeletonLoader();
+    aiResponseContainer.appendChild(skeletonLoader);
     messagesArea.scrollTop = messagesArea.scrollHeight;
 
     try {
@@ -224,13 +310,18 @@ form.addEventListener('submit', async function (e) {
             }
 
             if (eventType === "chunk") {
-                streamingText.textContent += data.text;
-                messagesArea.scrollTop = messagesArea.scrollHeight;
+                // Chunks stream the raw JSON as Gemini generates it — not meant
+                // for display. The skeleton loader stands in until "done" fires.
+                return;
             } else if (eventType === "done") {
-                streamingText.remove();
+                skeletonLoader.remove();
                 await displayRecommendations(aiResponseContainer, data);
             } else if (eventType === "error") {
-                streamingText.textContent = "Something went wrong: " + data.details;
+                skeletonLoader.remove();
+                const errorNote = document.createElement('p');
+                errorNote.className = 'reqNote';
+                errorNote.textContent = "Something went wrong: " + data.details;
+                aiResponseContainer.appendChild(errorNote);
             }
         }
 
@@ -238,10 +329,6 @@ form.addEventListener('submit', async function (e) {
             const { done, value } = await reader.read();
 
             if (done) {
-                // Flush the decoder and process whatever is left in the buffer.
-                // Without this, a final event that isn't followed by a trailing
-                // blank line (very common when the server closes the stream
-                // right after writing it) gets silently discarded.
                 buffer += decoder.decode();
                 if (buffer.trim()) {
                     const leftoverParts = buffer.split("\n\n");
@@ -262,5 +349,10 @@ form.addEventListener('submit', async function (e) {
         }
     } catch (error) {
         console.error("Failed to fetch recommendations:", error);
+        skeletonLoader.remove();
+        const errorNote = document.createElement('p');
+        errorNote.className = 'reqNote';
+        errorNote.textContent = "Something went wrong: " + error.message;
+        aiResponseContainer.appendChild(errorNote);
     }
 });

@@ -21,11 +21,13 @@ export async function getRecommendations(category, genre, mood, additionalInfo) 
     2. Consider all provided preferences when ranking the recommendations.
     3. If some preferences are missing, make reasonable assumptions based on the available information.
     4. For each recommendation, provide:
-      - Title (Must start with a space)
-      - Brief explanation (1–2 sentences) describing why it matches the user's preferences. (Must start with a space)
-      - imageSearchText: A concise search query that can be used to find a representative image of the recommendation. Must written in lowercase.
-    5. Return *only valid JSON* with no markdown, comments, or additional text.
-
+      - Title
+      - Brief explanation (1–2 sentences) describing why it matches the user's preferences.
+      - creator: the artist (music), director/studio (movie, series, anime), or developer (game). Leave "" if not applicable (e.g. acads, lifestyle).
+      - year: the release year, as a 4-digit string. Leave "" if unknown or not applicable.
+      - type: only for category "movie-series" — either "movie" or "tv". Leave "" for all other categories.
+    5. Use the creator/year/type fields to disambiguate titles that could be confused with something else of the same name (e.g. a remake, a same-titled song by a different artist, a movie vs. a TV series).
+    6. Return *only valid JSON* with no markdown, comments, or additional text.
     JSON format:
 
     {
@@ -33,27 +35,37 @@ export async function getRecommendations(category, genre, mood, additionalInfo) 
         {
           "title": "",
           "description": "",
-          "imageSearchText": ""
+          "creator": "",
+          "year": "",
+          "type": ""
         },
         {
           "title": "",
           "description": "",
-          "imageSearchText": ""
+          "creator": "",
+          "year": "",
+          "type": ""
         },
         {
           "title": "",
           "description": "",
-          "imageSearchText": ""
+          "creator": "",
+          "year": "",
+          "type": ""
         },
         {
           "title": "",
           "description": "",
-          "imageSearchText": ""
+          "creator": "",
+          "year": "",
+          "type": ""
         },
         {
           "title": "",
           "description": "",
-          "imageSearchText": ""
+          "creator": "",
+          "year": "",
+          "type": ""
         }
       ]
     }
@@ -61,4 +73,3 @@ export async function getRecommendations(category, genre, mood, additionalInfo) 
   });
   return result; 
 }
-
