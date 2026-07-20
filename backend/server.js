@@ -8,6 +8,31 @@ import { supabase } from "./db.js";
 
 const app = express();
 
+async function withRetry(fn, { retries = 3, baseDelay = 800, onRetry } = {}) {
+    let lastErr;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+            return await fn(attempt);
+        } catch (err) {
+            lastErr = err;
+            if (!isRetryableGeminiError(err) || attempt === retries) throw err;
+
+            const delay = baseDelay * 2 ** attempt + Math.random() * 300; // jitter
+            if (onRetry) onRetry(attempt, delay, err);
+            await new Promise((resolve) => setTimeout(resolve, delay));
+        }
+    }
+    throw lastErr;
+}
+
+function isRetryableGeminiError(err) {
+    const status = err?.status ?? err?.code ?? err?.response?.status;
+    if (status === 503 || status === 429) return true;
+
+    const message = err?.message || "";
+    return /"code":\s*(503|429)/.test(message) || /UNAVAILABLE|RESOURCE_EXHAUSTED/i.test(message);
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -29,17 +54,33 @@ app.post("/api/recommendations", async (req, res) => {
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Connection", "keep-alive");
 
-        const stream = await getRecommendations(category, genre, mood, additionalInfo);
+        const output = await withRetry(
+            async (attempt) => {
+                if (attempt > 0) {
+                    res.write(`event: retry\ndata: ${JSON.stringify({ attempt })}\n\n`);
+                }
 
-        let fullText = "";
-        for await (const chunk of stream) {
-            const piece = chunk.text || "";
-            fullText += piece;
-            res.write(`event: chunk\ndata: ${JSON.stringify({ text: piece })}\n\n`);
-        }
+                const stream = await getRecommendations(category, genre, mood, additionalInfo);
 
-        const cleaned = fullText.replace(/```json|```/g, "").trim();
-        const output = JSON.parse(cleaned);
+                let fullText = "";
+                for await (const chunk of stream) {
+                    const piece = chunk.text || "";
+                    fullText += piece;
+                    res.write(`event: chunk\ndata: ${JSON.stringify({ text: piece })}\n\n`);
+                }
+
+                const cleaned = fullText.replace(/```json|```/g, "").trim();
+                return JSON.parse(cleaned);
+            },
+            {
+                onRetry: (attempt, delay, err) => {
+                    console.warn(
+                        `Gemini call failed (attempt ${attempt + 1}), retrying in ${Math.round(delay)}ms:`,
+                        err.message
+                    );
+                },
+            }
+        );
 
         const imageUrls = await getUrls(category, output);
         console.log("category received:", category);

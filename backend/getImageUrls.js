@@ -221,7 +221,6 @@ async function resolveLifestyleImage(recommendation) {
     }
 }
 
-
 async function getMusicImageUrls(output) {
     return Promise.all(output.recommendations.map(resolveMusicImage));
 }

@@ -218,17 +218,6 @@ async function displayRecommendations(aiResponseContainer, output) {
         recIndex.className = "recIndex";
         recIndex.textContent = String(index).padStart(2, "0");
 
-        const recImgWrap = document.createElement("div");
-        recImgWrap.className = "recImgWrap";
-
-        const recImg = document.createElement("img");
-        recImg.className = "recImg";
-        recImg.src = recommendation.imageUrl;
-        recImg.alt = recommendation.title;
-        recImg.loading = "lazy";
-        recImg.addEventListener('click', () => openLightbox(recommendation.imageUrl, recommendation.title));
-        recImgWrap.appendChild(recImg);
-
         const recBody = document.createElement("div");
         recBody.className = "recBody";
 
@@ -239,7 +228,25 @@ async function displayRecommendations(aiResponseContainer, output) {
         recDesc.className = "recDesc";
 
         recBody.append(recTitle, recDesc);
-        recCard.append(recIndex, recImgWrap, recBody);
+
+        if (recommendation.imageUrl) {
+            const recImgWrap = document.createElement("div");
+            recImgWrap.className = "recImgWrap";
+
+            const recImg = document.createElement("img");
+            recImg.className = "recImg";
+            recImg.src = recommendation.imageUrl;
+            recImg.alt = recommendation.title;
+            recImg.loading = "lazy";
+            recImg.addEventListener('click', () => openLightbox(recommendation.imageUrl, recommendation.title));
+            recImgWrap.appendChild(recImg);
+
+            recCard.append(recIndex, recImgWrap, recBody);
+        } else {
+            recCard.classList.add("recCard-noImg");
+            recCard.append(recIndex, recBody);
+        }
+
         aiResponseContainer.appendChild(recCard);
 
         await typeText(recTitle, recommendation.title, 80);
@@ -266,6 +273,11 @@ form.addEventListener('submit', async function (e) {
     const aiResponseContainer = document.createElement('div');
     aiResponseContainer.className = 'aiResponseContainer';
     messagesArea.appendChild(aiResponseContainer);
+
+    const statusNote = document.createElement('p');
+    statusNote.className = 'reqNote statusNote';
+    statusNote.style.display = 'none';
+    aiResponseContainer.appendChild(statusNote);
 
     const skeletonLoader = createSkeletonLoader();
     aiResponseContainer.appendChild(skeletonLoader);
@@ -310,13 +322,16 @@ form.addEventListener('submit', async function (e) {
             }
 
             if (eventType === "chunk") {
-                // Chunks stream the raw JSON as Gemini generates it — not meant
-                // for display. The skeleton loader stands in until "done" fires.
                 return;
+            } else if (eventType === "retry") {
+                statusNote.textContent = "The model is busy — retrying...";
+                statusNote.style.display = 'block';
             } else if (eventType === "done") {
+                statusNote.remove();
                 skeletonLoader.remove();
                 await displayRecommendations(aiResponseContainer, data);
             } else if (eventType === "error") {
+                statusNote.remove();
                 skeletonLoader.remove();
                 const errorNote = document.createElement('p');
                 errorNote.className = 'reqNote';
@@ -349,6 +364,7 @@ form.addEventListener('submit', async function (e) {
         }
     } catch (error) {
         console.error("Failed to fetch recommendations:", error);
+        statusNote.remove();
         skeletonLoader.remove();
         const errorNote = document.createElement('p');
         errorNote.className = 'reqNote';
