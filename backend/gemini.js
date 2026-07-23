@@ -29,7 +29,6 @@ export async function getRecommendations(category, genre, mood, additionalInfo) 
     5. Use the creator/year/type fields to disambiguate titles that could be confused with something else of the same name (e.g. a remake, a same-titled song by a different artist, a movie vs. a TV series).
     6. Return *only valid JSON* with no markdown, comments, or additional text.
     JSON format:
-
     {
       "recommendations": [
         {

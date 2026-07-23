@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { getRecommendations } from "./gemini.js";
 import { getUrls } from "./getImageUrls.js";
-
+import { signUp, logIn, saveConvo, getUserIdFromToken, getConversations } from "./db.js";
 
 const app = express();
 
@@ -39,6 +39,22 @@ const __dirname = path.dirname(__filename);
 app.use(cors());
 app.use(express.json());
 
+
+app.use(async (req, res, next) => {
+    const authHeader = req.headers.authorization || "";
+    const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    req.userId = await getUserIdFromToken(token);
+    next();
+});
+
+
+function requireAuth(req, res, next) {
+    if (!req.userId) {
+        return res.status(401).json({ error: "You must be logged in" });
+    }
+    next();
+}
+
 app.use(express.static(path.join(__dirname, "..")));
 
 app.get("/", (req, res) => {
@@ -46,14 +62,15 @@ app.get("/", (req, res) => {
 });
 
 app.post("/api/recommendations", async (req, res) => {
-    try {
-        const { category, genre, mood, additionalInfo } = req.body;
+    const { category, genre, mood, additionalInfo } = req.body;
+    let output = null;
 
+    try {
         res.setHeader("Content-Type", "text/event-stream");
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Connection", "keep-alive");
 
-        const output = await withRetry(
+        output = await withRetry(
             async (attempt) => {
                 if (attempt > 0) {
                     res.write(`event: retry\ndata: ${JSON.stringify({ attempt })}\n\n`);
@@ -99,13 +116,59 @@ app.post("/api/recommendations", async (req, res) => {
         res.write(`event: error\ndata: ${JSON.stringify({ error: "Failed to generate recommendations", details: error.message })}\n\n`);
         res.end();
     }
+
+    if (output) {
+        await saveConvo(
+            { category, genre, mood, additionalInfo },
+            output,
+            req.userId
+        );
+    }
+});
+
+app.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+    }
+
+    try {
+        const result = await logIn(email, password);
+        return res.status(200).json(result);
+    } catch (err) {
+        console.error(err);
+        return res.status(401).json({ error: "Invalid email or password" });
+    }
+});
+
+
+app.post("/signup", async (req, res) => {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+        return res.status(400).json({ error: "Username, email, and password are required" });
+    }
+
+    try {
+        const result = await signUp(username, email, password);
+        return res.status(201).json(result);
+    } catch (err) {
+        console.error(err);
+        return res.status(400).json({ error: "Signup failed" });
+    }
+});
+
+app.get("/api/conversations", requireAuth, async (req, res) => {
+    try {
+        const conversations = await getConversations(req.userId);
+        return res.status(200).json({ conversations });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Failed to load conversation history" });
+    }
 });
 
 app.listen(3000, () => {
     console.log("Server running on port 3000");
 });
-
-
-
-// Todo: 
-

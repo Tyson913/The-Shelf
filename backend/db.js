@@ -11,7 +11,7 @@ async function signUp(username, email, password) {
 
     if (error) {
         console.log(error);
-        return;
+        throw error;
     }
 
     const userId = data.user.id;
@@ -24,10 +24,14 @@ async function signUp(username, email, password) {
 
     if (insertError) {
         console.log(insertError);
-        return;
+        throw insertError;
     }
 
-    return userId;
+    return {
+        userId,
+        accessToken: data.session?.access_token ?? null,
+        refreshToken: data.session?.refresh_token ?? null,
+    };
 }
 
 async function logIn(email, password) {
@@ -35,7 +39,24 @@ async function logIn(email, password) {
 
     if (error) {
         console.log(error);
-        return;
+        throw error;
+    }
+
+    return {
+        userId: data.user.id,
+        accessToken: data.session.access_token,
+        refreshToken: data.session.refresh_token,
+    };
+}
+
+async function getUserIdFromToken(accessToken) {
+    if (!accessToken) return null;
+
+    const { data, error } = await supabase.auth.getUser(accessToken);
+
+    if (error) {
+        console.log(error);
+        return null;
     }
 
     return data.user.id;
@@ -60,4 +81,19 @@ async function saveConvo(request, response, userId) {
     return data; 
 }
 
-export { signUp, logIn, saveConvo };
+async function getConversations(userId) {
+    const { data, error } = await supabase
+        .from('Conversations')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.log(error);
+        throw error;
+    }
+
+    return data;
+}
+
+export { signUp, logIn, saveConvo, getUserIdFromToken, getConversations };

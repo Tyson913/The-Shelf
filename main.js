@@ -150,7 +150,6 @@ function createSkeletonLoader() {
         skelCard.append(skelImg, skelBody);
         skeleton.appendChild(skelCard);
     }
-
     return skeleton;
 }
 
@@ -372,3 +371,23 @@ form.addEventListener('submit', async function (e) {
         aiResponseContainer.appendChild(errorNote);
     }
 });
+
+
+
+// auths 
+
+const signUpForm = document.getElementById('signupForm');
+const logInForm = document.getElementById('loginForm');
+
+signUpForm.addEventListener('submit', function (){
+
+
+})
+
+
+
+logInForm.addEventListener('submit', function (){
+
+
+    
+})
