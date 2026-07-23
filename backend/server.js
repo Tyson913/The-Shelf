@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { getRecommendations } from "./gemini.js";
 import { getUrls } from "./getImageUrls.js";
-import { supabase } from "./db.js";
+
 
 const app = express();
 
@@ -41,7 +41,6 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "..")));
 
-supabase;
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "..", "index.html"));
 });
@@ -105,3 +104,8 @@ app.post("/api/recommendations", async (req, res) => {
 app.listen(3000, () => {
     console.log("Server running on port 3000");
 });
+
+
+
+// Todo: 
+
