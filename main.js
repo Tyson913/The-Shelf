@@ -295,6 +295,7 @@ form.addEventListener('submit', async function (e) {
                 additionalInfo
             })
         });
+
         if (!response.ok) {
             throw new Error(`Server error: ${response.status}`);
         }
@@ -372,22 +373,46 @@ form.addEventListener('submit', async function (e) {
     }
 });
 
-
-
-// auths 
-
 const signUpForm = document.getElementById('signupForm');
+const signupEmail = document.getElementById('signupEmail');
+const signupPassword = document.getElementById('signupPassword');
+
 const logInForm = document.getElementById('loginForm');
+const loginEmail = document.getElementById('loginEmail');
+const loginPassword = document.getElementById('loginPassword');
 
 signUpForm.addEventListener('submit', function (){
+    const response = await fetch("http://localhost:3000/signup", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+            body: JSON.stringify({
+                signupEmail,
+                signupPassword
+            })
+        });
 
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
 
 })
-
-
 
 logInForm.addEventListener('submit', function (){
+    const response = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+            body: JSON.stringify({
+                loginEmail,
+                loginPassword
+            })
+        });
 
-
-    
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
 })
+

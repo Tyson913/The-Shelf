@@ -6,7 +6,7 @@ const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-async function signUp(username, email, password) {
+async function signUp(email, password) {
     const { data, error } = await supabase.auth.signUp({ email, password });
 
     if (error) {
@@ -18,7 +18,6 @@ async function signUp(username, email, password) {
 
     const { error: insertError } = await supabase.from("Users").insert({
         id: userId,
-        username: username,
         email: email,
     });
 
