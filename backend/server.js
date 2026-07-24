@@ -17,7 +17,7 @@ async function withRetry(fn, { retries = 3, baseDelay = 800, onRetry } = {}) {
             lastErr = err;
             if (!isRetryableGeminiError(err) || attempt === retries) throw err;
 
-            const delay = baseDelay * 2 ** attempt + Math.random() * 300; // jitter
+            const delay = baseDelay * 2 ** attempt + Math.random() * 300; 
             if (onRetry) onRetry(attempt, delay, err);
             await new Promise((resolve) => setTimeout(resolve, delay));
         }
