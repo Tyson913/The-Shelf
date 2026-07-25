@@ -97,8 +97,6 @@ newChatBtn.addEventListener('click', () => {
     setActiveHistoryItem(null);
 });
 
-// --- History sidebar rendering ---
-
 function categoryLabelFor(value) {
     return categoryLabels[value] || value || '—';
 }
@@ -479,7 +477,7 @@ form.addEventListener('submit', async function (e) {
                 await displayRecommendations(aiResponseContainer, data);
                 recommendationCounter++;
                 if (isGuest && recommendationCounter >= 2) {
-                    logInForm.style.display = 'flex';
+                    window.openAuth('signupForm');
                 }
                 if (!isGuest) {
                     prependHistoryItem({

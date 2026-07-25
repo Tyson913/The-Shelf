@@ -323,6 +323,9 @@
                 if (lastFocused) lastFocused.focus();
             }
 
+            window.openAuth = openAuth;
+            window.closeAuth = closeAuth;
+
             document.querySelectorAll('[data-auth]').forEach(function (btn) {
                 btn.addEventListener('click', function () {
                     openAuth(btn.dataset.auth === 'login' ? 'loginForm' : 'signupForm');
