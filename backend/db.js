@@ -2,12 +2,17 @@ import { createClient } from '@supabase/supabase-js'
 import 'dotenv/config';
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY; 
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey);
+
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+});
 
 async function signUp(email, password) {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabaseAuth.auth.signUp({ email, password });
 
     if (error) {
         console.log(error);
@@ -16,7 +21,7 @@ async function signUp(email, password) {
 
     const userId = data.user.id;
 
-    const { error: insertError } = await supabase.from("Users").insert({
+    const { error: insertError } = await supabaseAdmin.from("Users").insert({
         id: userId,
         email: email,
     });
@@ -34,7 +39,7 @@ async function signUp(email, password) {
 }
 
 async function logIn(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabaseAuth.auth.signInWithPassword({ email, password });
 
     if (error) {
         console.log(error);
@@ -51,7 +56,7 @@ async function logIn(email, password) {
 async function getUserIdFromToken(accessToken) {
     if (!accessToken) return null;
 
-    const { data, error } = await supabase.auth.getUser(accessToken);
+    const { data, error } = await supabaseAuth.auth.getUser(accessToken);
 
     if (error) {
         console.log(error);
@@ -62,7 +67,7 @@ async function getUserIdFromToken(accessToken) {
 }
 
 async function saveConvo(request, response, userId) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
         .from('Conversations')
         .insert({
             request: request,
@@ -81,7 +86,7 @@ async function saveConvo(request, response, userId) {
 }
 
 async function getConversations(userId) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
         .from('Conversations')
         .select('*')
         .eq('user_id', userId)
