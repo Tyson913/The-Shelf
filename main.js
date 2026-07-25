@@ -57,6 +57,10 @@ updateGenreMood();
 
 categoryDropdown.addEventListener('change', updateGenreMood);
 
+const categoryLabels = Object.fromEntries(
+    Array.from(categoryDropdown.options).map(option => [option.value, option.text])
+);
+
 const landingPage = document.getElementById("landingPage");
 const chatPage = document.getElementById("chatPage");
 const chatEntryBttn = document.getElementById("chatEntryBttn");
@@ -71,16 +75,141 @@ chatEntryBttn.addEventListener('click', (e) => {
 
 const toggleHistoryBtn = document.getElementById('toggleHistory');
 const closeHistoryBtn = document.getElementById('closeHistory');
+const newChatBtn = document.querySelector('.newChatBtn');
+const historyListEl = document.querySelector('.historyList');
 
-toggleHistoryBtn.addEventListener('click', () => {
-    chatPage.classList.toggle('historyOpen');
+function openHistorySidebar() {
+    chatPage.classList.add('historyOpen');
     toggleHistoryBtn.style.display = 'none';
+}
+
+function closeHistorySidebar() {
+    chatPage.classList.remove('historyOpen');
+    if (!isGuest) toggleHistoryBtn.style.display = 'block';
+}
+
+toggleHistoryBtn.addEventListener('click', openHistorySidebar);
+closeHistoryBtn.addEventListener('click', closeHistorySidebar);
+
+newChatBtn.addEventListener('click', () => {
+    messagesArea.innerHTML = '';
+    chatSpace.classList.remove('hasMessages');
+    setActiveHistoryItem(null);
 });
 
-closeHistoryBtn.addEventListener('click', () => {
-    chatPage.classList.remove('historyOpen');
-    toggleHistoryBtn.style.display = "block";
-});
+// --- History sidebar rendering ---
+
+function categoryLabelFor(value) {
+    return categoryLabels[value] || value || '—';
+}
+
+function buildHistoryTags(request) {
+    const tagsWrap = document.createElement('div');
+    tagsWrap.className = 'historyTags';
+
+    [
+        { value: categoryLabelFor(request?.category), variant: 'cat' },
+        { value: request?.genre, variant: 'genre' },
+        { value: request?.mood, variant: 'mood' }
+    ].forEach(({ value, variant }) => {
+        const tag = document.createElement('div');
+        tag.className = `historyTag historyTag-${variant}`;
+        tag.textContent = value || '—';
+        tagsWrap.appendChild(tag);
+    });
+
+    return tagsWrap;
+}
+
+function createHistoryItem(entry) {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'historyItem';
+    item.dataset.id = entry.id;
+
+    const title = document.createElement('span');
+    title.className = 'historyItemTitle';
+    title.textContent = entry.ai_response?.title || 'Untitled request';
+
+    item.append(buildHistoryTags(entry.request), title);
+    item.addEventListener('click', () => loadPastConversation(entry));
+
+    return item;
+}
+
+function renderHistoryEmptyState(message) {
+    historyListEl.innerHTML = '';
+    const empty = document.createElement('p');
+    empty.className = 'historyEmpty';
+    empty.textContent = message || 'Your past requests will show up here.';
+    historyListEl.appendChild(empty);
+}
+
+function renderHistoryList(conversations) {
+    historyListEl.innerHTML = '';
+    if (!conversations.length) {
+        renderHistoryEmptyState();
+        return;
+    }
+    conversations.forEach(entry => historyListEl.appendChild(createHistoryItem(entry)));
+}
+
+function prependHistoryItem(entry) {
+    const empty = historyListEl.querySelector('.historyEmpty');
+    if (empty) empty.remove();
+    historyListEl.prepend(createHistoryItem(entry));
+}
+
+function setActiveHistoryItem(id) {
+    historyListEl.querySelectorAll('.historyItem').forEach(el => {
+        el.classList.toggle('isActive', el.dataset.id === String(id));
+    });
+}
+
+async function loadHistory() {
+    if (isGuest) return;
+    renderHistoryEmptyState('Loading your history…');
+
+    try {
+        const response = await fetch("http://localhost:3000/api/conversations", {
+            headers: { Authorization: `Bearer ${getAuthToken()}` }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        const { conversations } = await response.json();
+        renderHistoryList(conversations);
+    } catch (err) {
+        console.error("Failed to load history:", err);
+        renderHistoryEmptyState("Couldn't load your history.");
+    }
+}
+
+function loadPastConversation(entry) {
+    chatSpace.classList.add('hasMessages');
+    messagesArea.innerHTML = '';
+
+    renderUserRequest({
+        categoryLabel: categoryLabelFor(entry.request?.category),
+        genre: entry.request?.genre,
+        mood: entry.request?.mood,
+        additionalInfo: entry.request?.additionalInfo
+    });
+
+    const aiResponseContainer = document.createElement('div');
+    aiResponseContainer.className = 'aiResponseContainer';
+    messagesArea.appendChild(aiResponseContainer);
+
+    renderRecommendationsInstant(aiResponseContainer, entry.ai_response || {});
+
+    setActiveHistoryItem(entry.id);
+
+    if (window.matchMedia('(max-width: 1024px)').matches) {
+        closeHistorySidebar();
+    }
+}
 
 function typeText(element, text, speed) {
     return new Promise(resolve => {
@@ -205,47 +334,51 @@ function closeLightbox() {
     document.body.style.overflow = '';
 }
 
+function buildRecCard(recommendation, index) {
+    const recCard = document.createElement("div");
+    recCard.className = "recCard";
+
+    const recIndex = document.createElement("span");
+    recIndex.className = "recIndex";
+    recIndex.textContent = String(index).padStart(2, "0");
+
+    const recBody = document.createElement("div");
+    recBody.className = "recBody";
+
+    const recTitle = document.createElement("h4");
+    recTitle.className = "recTitle";
+
+    const recDesc = document.createElement("p");
+    recDesc.className = "recDesc";
+
+    recBody.append(recTitle, recDesc);
+
+    if (recommendation.imageUrl) {
+        const recImgWrap = document.createElement("div");
+        recImgWrap.className = "recImgWrap";
+
+        const recImg = document.createElement("img");
+        recImg.className = "recImg";
+        recImg.src = recommendation.imageUrl;
+        recImg.alt = recommendation.title;
+        recImg.loading = "lazy";
+        recImg.addEventListener('click', () => openLightbox(recommendation.imageUrl, recommendation.title));
+        recImgWrap.appendChild(recImg);
+
+        recCard.append(recIndex, recImgWrap, recBody);
+    } else {
+        recCard.classList.add("recCard-noImg");
+        recCard.append(recIndex, recBody);
+    }
+
+    return { recCard, recTitle, recDesc };
+}
+
 async function displayRecommendations(aiResponseContainer, output) {
     let index = 0;
     for (const recommendation of output.recommendations) {
         index++;
-
-        const recCard = document.createElement("div");
-        recCard.className = "recCard";
-
-        const recIndex = document.createElement("span");
-        recIndex.className = "recIndex";
-        recIndex.textContent = String(index).padStart(2, "0");
-
-        const recBody = document.createElement("div");
-        recBody.className = "recBody";
-
-        const recTitle = document.createElement("h4");
-        recTitle.className = "recTitle";
-
-        const recDesc = document.createElement("p");
-        recDesc.className = "recDesc";
-
-        recBody.append(recTitle, recDesc);
-
-        if (recommendation.imageUrl) {
-            const recImgWrap = document.createElement("div");
-            recImgWrap.className = "recImgWrap";
-
-            const recImg = document.createElement("img");
-            recImg.className = "recImg";
-            recImg.src = recommendation.imageUrl;
-            recImg.alt = recommendation.title;
-            recImg.loading = "lazy";
-            recImg.addEventListener('click', () => openLightbox(recommendation.imageUrl, recommendation.title));
-            recImgWrap.appendChild(recImg);
-
-            recCard.append(recIndex, recImgWrap, recBody);
-        } else {
-            recCard.classList.add("recCard-noImg");
-            recCard.append(recIndex, recBody);
-        }
-
+        const { recCard, recTitle, recDesc } = buildRecCard(recommendation, index);
         aiResponseContainer.appendChild(recCard);
 
         await typeText(recTitle, recommendation.title, 80);
@@ -254,7 +387,19 @@ async function displayRecommendations(aiResponseContainer, output) {
     }
 }
 
+function renderRecommendationsInstant(aiResponseContainer, output) {
+    let index = 0;
+    for (const recommendation of output.recommendations || []) {
+        index++;
+        const { recCard, recTitle, recDesc } = buildRecCard(recommendation, index);
+        recTitle.textContent = recommendation.title;
+        recDesc.textContent = recommendation.description;
+        aiResponseContainer.appendChild(recCard);
+    }
+}
+
 const form = document.getElementById("inputsForm");
+let recommendationCounter = 0;
 
 form.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -283,10 +428,12 @@ form.addEventListener('submit', async function (e) {
     messagesArea.scrollTop = messagesArea.scrollHeight;
 
     try {
+        const authToken = getAuthToken();
         const response = await fetch("http://localhost:3000/api/recommendations", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                ...(authToken ? { Authorization: `Bearer ${authToken}` } : {})
             },
             body: JSON.stringify({
                 category,
@@ -330,6 +477,17 @@ form.addEventListener('submit', async function (e) {
                 statusNote.remove();
                 skeletonLoader.remove();
                 await displayRecommendations(aiResponseContainer, data);
+                recommendationCounter++;
+                if (isGuest && recommendationCounter >= 2) {
+                    logInForm.style.display = 'flex';
+                }
+                if (!isGuest) {
+                    prependHistoryItem({
+                        id: `local-${Date.now()}`,
+                        request: { category, genre, mood, additionalInfo },
+                        ai_response: data
+                    });
+                }
             } else if (eventType === "error") {
                 statusNote.remove();
                 skeletonLoader.remove();
@@ -371,6 +529,7 @@ form.addEventListener('submit', async function (e) {
         errorNote.textContent = "Something went wrong: " + error.message;
         aiResponseContainer.appendChild(errorNote);
     }
+
 });
 
 const signUpForm = document.getElementById('signupForm');
@@ -381,15 +540,43 @@ const logInForm = document.getElementById('loginForm');
 const loginEmail = document.getElementById('loginEmail');
 const loginPassword = document.getElementById('loginPassword');
 
-signUpForm.addEventListener('submit', function (){
-    const response = await fetch("http://localhost:3000/signup", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
+const AUTH_TOKEN_KEY = 'shelfAuthToken';
+
+function getAuthToken() {
+    return localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+function setAuthToken(token) {
+    if (token) {
+        localStorage.setItem(AUTH_TOKEN_KEY, token);
+    } else {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+    }
+}
+
+let isGuest = !getAuthToken();
+
+function applyGuestUI() {
+    toggleHistoryBtn.style.display = isGuest ? 'none' : 'block';
+    if (isGuest) {
+        chatPage.classList.remove('historyOpen');
+    }
+}
+
+applyGuestUI();
+if (!isGuest) loadHistory();
+
+signUpForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    try {
+        const response = await fetch("http://localhost:3000/signup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
-                signupEmail,
-                signupPassword
+                email: signupEmail.value,
+                password: signupPassword.value
             })
         });
 
@@ -397,22 +584,40 @@ signUpForm.addEventListener('submit', function (){
             throw new Error(`Server error: ${response.status}`);
         }
 
+        const result = await response.json();
+        setAuthToken(result.accessToken);
+        isGuest = false;
+        applyGuestUI();
+        loadHistory();
+    } catch (err) {
+        console.error("Signup failed:", err);
+    }
 })
 
-logInForm.addEventListener('submit', function (){
-    const response = await fetch("http://localhost:3000/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
+logInForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    try {
+        const response = await fetch("http://localhost:3000/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
-                loginEmail,
-                loginPassword
+                email: loginEmail.value,
+                password: loginPassword.value
             })
         });
 
         if (!response.ok) {
             throw new Error(`Server error: ${response.status}`);
         }
-})
 
+        const result = await response.json();
+        setAuthToken(result.accessToken);
+        isGuest = false;
+        applyGuestUI();
+        loadHistory();
+    } catch (err) {
+        console.error("Login failed:", err);
+    }
+})

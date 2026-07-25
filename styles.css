@@ -482,10 +482,85 @@ section { width: 100%; }
   min-height: 0;
   box-sizing: border-box;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   padding: 12px 16px 16px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--hairline) transparent;
+}
+
+.historyItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  text-align: left;
+  transition: background 0.16s var(--ease);
+}
+
+.historyItem:hover { background: var(--paper); }
+
+.historyItem.isActive { background: var(--ember-soft); }
+
+.historyTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+}
+
+.historyTag {
+  max-width: 100%;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  color: var(--slate);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.historyItem.isActive .historyTag { background: var(--surface); }
+
+.historyTag-cat {
+  background: var(--ember-soft);
+  color: var(--ember-dark);
+}
+
+.historyItemTitle {
+  width: 100%;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.historyEmpty {
+  margin: 0;
+  padding: 22px 10px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--slate-light);
+  text-align: center;
 }
 
 .historyList::-webkit-scrollbar { width: 6px; }
@@ -825,8 +900,6 @@ select {
   padding: 2px 14px 2px 0;
 }
 
-
-/* AI response loading skeleton */
 .recSkeleton {
   display: flex;
   flex-direction: column;
@@ -886,8 +959,6 @@ select {
   .skelImg, .skelLine { animation: none; }
 }
 
-
-/* Fullscreen image lightbox */
 .recImg { cursor: zoom-in; }
 
 .imgLightbox {

@@ -98,8 +98,10 @@ app.post("/api/recommendations", async (req, res) => {
             }
         );
 
-        const imageUrls = await getUrls(category, output);
-        console.log("category received:", category);
+        const imageUrls = req.userId
+            ? await getUrls(category, output)
+            : output.recommendations.map(() => null);
+        console.log("category received:", category, "| logged in:", Boolean(req.userId));
         console.log("imageUrls returned:", imageUrls);
 
         output.recommendations = output.recommendations.map((recommendation, index) => ({
@@ -117,7 +119,7 @@ app.post("/api/recommendations", async (req, res) => {
         res.end();
     }
 
-    if (output) {
+    if (output && req.userId) {
         await saveConvo(
             { category, genre, mood, additionalInfo },
             output,
@@ -146,7 +148,7 @@ app.post("/login", async (req, res) => {
 app.post("/signup", async (req, res) => {
     const { email, password } = req.body;
 
-    if (!username || !email || !password) {
+    if (!email || !password) {
         return res.status(400).json({ error: "Email, and password are required" });
     }
 

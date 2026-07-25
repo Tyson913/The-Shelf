@@ -27,9 +27,11 @@ export async function getRecommendations(category, genre, mood, additionalInfo) 
       - year: the release year, as a 4-digit string. Leave "" if unknown or not applicable.
       - type: only for category "movie-series" — either "movie" or "tv". Leave "" for all other categories.
     5. Use the creator/year/type fields to disambiguate titles that could be confused with something else of the same name (e.g. a remake, a same-titled song by a different artist, a movie vs. a TV series).
-    6. Return *only valid JSON* with no markdown, comments, or additional text.
+    6. Also generate a "title": a short label (4–8 words, no trailing punctuation) that summarizes this *whole request* — not any single recommendation — for use as a history entry label (e.g. "Upbeat indie pop for a slow Sunday"). Produce exactly one, at the top level of the JSON.
+    7. Return *only valid JSON* with no markdown, comments, or additional text.
     JSON format:
     {
+      "title": "",
       "recommendations": [
         {
           "title": "",
