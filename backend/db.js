@@ -21,6 +21,18 @@ async function signUp(email, password) {
 
     const userId = data.user.id;
 
+    // Auto-confirm so signup works without the user clicking a confirmation email.
+    // Dev/testing convenience — bypassing email verification means anyone can sign up
+    // with an email they don't own, so gate or remove this before you ship to real users.
+    const { error: confirmError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+        email_confirm: true,
+    });
+
+    if (confirmError) {
+        console.log(confirmError);
+        throw confirmError;
+    }
+
     const { error: insertError } = await supabaseAdmin.from("Users").insert({
         id: userId,
         email: email,
@@ -31,10 +43,22 @@ async function signUp(email, password) {
         throw insertError;
     }
 
+    // signUp() doesn't return a session while confirmation was pending, so sign in
+    // now that the user is confirmed to get real tokens back.
+    const { data: signInData, error: signInError } = await supabaseAuth.auth.signInWithPassword({
+        email,
+        password,
+    });
+
+    if (signInError) {
+        console.log(signInError);
+        throw signInError;
+    }
+
     return {
         userId,
-        accessToken: data.session?.access_token ?? null,
-        refreshToken: data.session?.refresh_token ?? null,
+        accessToken: signInData.session?.access_token ?? null,
+        refreshToken: signInData.session?.refresh_token ?? null,
     };
 }
 
@@ -56,14 +80,28 @@ async function logIn(email, password) {
 async function getUserIdFromToken(accessToken) {
     if (!accessToken) return null;
 
-    const { data, error } = await supabaseAuth.auth.getUser(accessToken);
-
-    if (error) {
-        console.log(error);
+    // A real JWT always has 3 dot-separated segments (header.payload.signature).
+    // If it doesn't, don't bother calling Supabase — just treat it as unauthenticated.
+    // This is what stops a stray "undefined"/"null" string, an unstripped "Bearer "
+    // prefix, or a truncated header from throwing an unhandled AuthApiError.
+    if (typeof accessToken !== 'string' || accessToken.split('.').length !== 3) {
+        console.log('getUserIdFromToken: received a malformed token, treating as guest');
         return null;
     }
 
-    return data.user.id;
+    try {
+        const { data, error } = await supabaseAuth.auth.getUser(accessToken);
+
+        if (error) {
+            console.log(error);
+            return null;
+        }
+
+        return data.user.id;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
 }
 
 async function saveConvo(request, response, userId) {

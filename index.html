@@ -21,7 +21,6 @@
 
             <div id="landingPageMainCon">
                 <div class="heroCon">
-                    <span class="eyebrow"><i class="fa-solid fa-compass"></i> Mood-based recommendations</span>
                     <h1>Find your next <em>favorite thing.</em></h1>
                     <p>
                         The Shelf suggests what to watch, play, read, listen to, or do — across six categories:
@@ -33,42 +32,48 @@
                         <div class="statItem"><i class="fa-solid fa-face-smile"></i><span>Mood matched</span></div>
                         <div class="statItem"><i class="fa-solid fa-bolt"></i><span>Instant picks</span></div>
                     </div>
-                    <button id="chatEntryBttn" class="btn btn-primary">
-                        Get recommendations <i class="fa-solid fa-arrow-right"></i>
-                    </button>
+                    <div class="heroCtaRow">
+                        <button id="chatEntryBttn" class="btn btn-primary">
+                            Get recommendations
+                        </button>
+                        <span class="heroBadge"><i class="fa-solid fa-check"></i> Free to try — no account needed</span>
+                    </div>
                 </div>
 
                 <div class="catboxCon">
-                    <div class="catbox">
-                        <span class="catIcon" style="color: #d9a441;"><i class="fa-solid fa-music"></i></span>
+                    <div class="catbox" style="--spine: #d9a441;">
+                        <span class="catIcon"><i class="fa-solid fa-music"></i></span>
                         <h3>Music</h3>
                     </div>
-                    <div class="catbox">
-                        <span class="catIcon" style="color: #b8433c;"><i class="fa-solid fa-clapperboard"></i></span>
+                    <div class="catbox" style="--spine: #b8433c;">
+                        <span class="catIcon"><i class="fa-solid fa-clapperboard"></i></span>
                         <h3>Movies & Series</h3>
                     </div>
-                    <div class="catbox">
-                        <span class="catIcon" style="color: #c94577;"><i class="fa-solid fa-dragon"></i></span>
+                    <div class="catbox" style="--spine: #c94577;">
+                        <span class="catIcon"><i class="fa-solid fa-dragon"></i></span>
                         <h3>Anime</h3>
                     </div>
-                    <div class="catbox">
-                        <span class="catIcon" style="color: #3e6fa3;"><i class="fa-solid fa-book"></i></span>
+                    <div class="catbox" style="--spine: #3e6fa3;">
+                        <span class="catIcon"><i class="fa-solid fa-book"></i></span>
                         <h3>Academics</h3>
                     </div>
-                    <div class="catbox">
-                        <span class="catIcon" style="color: #4f9d6e;"><i class="fa-solid fa-gamepad"></i></span>
+                    <div class="catbox" style="--spine: #4f9d6e;">
+                        <span class="catIcon"><i class="fa-solid fa-gamepad"></i></span>
                         <h3>Gaming</h3>
                     </div>
-                    <div class="catbox">
-                        <span class="catIcon" style="color: #c97a45;"><i class="fa-solid fa-dumbbell"></i></span>
+                    <div class="catbox" style="--spine: #c97a45;">
+                        <span class="catIcon"><i class="fa-solid fa-dumbbell"></i></span>
                         <h3>Lifestyle</h3>
                     </div>
                 </div>
             </div>
 
             <section class="howItWorks" id="howItWorks">
-                <span class="eyebrow">How it works</span>
-                <h2>Three steps to your next pick</h2>
+                <div class="sectionIntro sectionIntro-center">
+                    <span class="sectionTab"><i class="fa-solid fa-bookmark"></i> How it works</span>
+                    <h2>Three steps to your next pick</h2>
+                    <p>No forms to fill out — just a category, a mood, and a minute.</p>
+                </div>
                 <div class="stepsGrid">
                     <div class="stepCard">
                         <span class="stepNum">01</span>
@@ -92,9 +97,122 @@
                 </div>
             </section>
 
+            <section class="features" id="features">
+                <div class="sectionIntro">
+                    <span class="sectionTab"><i class="fa-solid fa-feather-pointed"></i> Why The Shelf</span>
+                    <h2>Recommendations that know the room.</h2>
+                    <p>Most "recommended for you" lists ignore how you're actually feeling today. The Shelf doesn't.</p>
+                </div>
+                <div class="featureGrid">
+                    <article class="featureCard">
+                        <span class="featureIcon"><i class="fa-solid fa-face-smile"></i></span>
+                        <h3>Mood, not just genre</h3>
+                        <p>Tell us what you're after and how you're feeling — get picks tuned to the moment, not just a category.</p>
+                    </article>
+                    <article class="featureCard">
+                        <span class="featureIcon"><i class="fa-solid fa-layer-group"></i></span>
+                        <h3>Six worlds, one shelf</h3>
+                        <p>Music, Movies & Series, Anime, Academics, Gaming, and Lifestyle — every kind of recommendation in one place.</p>
+                    </article>
+                    <article class="featureCard">
+                        <span class="featureIcon"><i class="fa-solid fa-comments"></i></span>
+                        <h3>A conversation, not a form</h3>
+                        <p>Ask follow-up questions or steer the picks further — The Shelf's chat adapts as you go.</p>
+                    </article>
+                    <article class="featureCard">
+                        <span class="featureIcon"><i class="fa-solid fa-bookmark"></i></span>
+                        <h3>Save what you find</h3>
+                        <p>Create a free account to keep a running shelf of every recommendation, cover art included.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="preview" id="preview">
+                <div class="sectionIntro sectionIntro-center">
+                    <span class="sectionTab"><i class="fa-solid fa-wand-magic-sparkles"></i> See it in action</span>
+                    <h2>One mood, one match.</h2>
+                    <p>Here's roughly what a pick looks like once you tell The Shelf what you're after.</p>
+                </div>
+                <div class="previewDemo">
+                    <div class="previewPrompt">
+                        <div class="reqTags">
+                            <span class="reqTag">Movies & Series</span>
+                            <span class="reqTag">Comfort watch</span>
+                            <span class="reqTag">Cozy</span>
+                        </div>
+                        <p class="reqNote">Something slow and gentle for a rainy night in.</p>
+                    </div>
+                    <div class="previewCard">
+                        <span class="previewCardArt"><i class="fa-solid fa-clapperboard"></i></span>
+                        <div class="previewCardBody">
+                            <h3>A Quiet Corner Somewhere</h3>
+                            <p>A soft-spoken dramedy set in a small seaside town — the kind of show that asks nothing
+                                of you but your attention. Matched for its unhurried pace and low-stakes warmth.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="faq" id="faq">
+                <div class="sectionIntro sectionIntro-center">
+                    <span class="sectionTab"><i class="fa-solid fa-circle-question"></i> Good to know</span>
+                    <h2>Questions worth asking</h2>
+                </div>
+                <div class="faqList">
+                    <details class="faqItem">
+                        <summary>Is The Shelf free to use?</summary>
+                        <p>Yes. Guests get two free recommendations to try it out — signing up is free and unlocks
+                            unlimited picks, saved history, and cover art.</p>
+                    </details>
+                    <details class="faqItem">
+                        <summary>Do I need an account to get a recommendation?</summary>
+                        <p>No. You can ask for picks right away as a guest. An account just lets you keep a running
+                            shelf of everything you've found.</p>
+                    </details>
+                    <details class="faqItem">
+                        <summary>How does mood matching actually work?</summary>
+                        <p>Pick a category and genre, then tell us how you're feeling or add a quick note — The
+                            Shelf weighs all of it to hand you a pick worth your time.</p>
+                    </details>
+                    <details class="faqItem">
+                        <summary>What categories does The Shelf cover?</summary>
+                        <p>Music, Movies & Series, Anime, Academics, Gaming, and Lifestyle — with more on the way.
+                        </p>
+                    </details>
+                </div>
+            </section>
+
+            <section class="finalCta">
+                <h2>Your next favorite thing is one shelf away.</h2>
+                <p>No credit card, no commitment — just tell us what you're in the mood for.</p>
+                <button class="btn btn-primary" data-auth="signup">
+                    Create your shelf <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </section>
+
             <footer class="siteFooter">
-                <img src="the-shelf-logo-horizontal.svg" alt="" class="navLogo">
-                <span class="copyright">All rights reserved 2026</span>
+                <div class="footerTop">
+                    <div class="footerBrand">
+                        <img src="the-shelf-logo-horizontal.svg" alt="The Shelf" class="navLogo">
+                        <p>Mood-based recommendations for whatever you're in the mood for.</p>
+                    </div>
+                    <nav class="footerNav">
+                        <div class="footerCol">
+                            <span class="footerColTitle">Explore</span>
+                            <a href="#features">Why The Shelf</a>
+                            <a href="#howItWorks">How it works</a>
+                            <a href="#faq">FAQ</a>
+                        </div>
+                        <div class="footerCol">
+                            <span class="footerColTitle">Account</span>
+                            <button type="button" data-auth="signup">Sign Up</button>
+                            <button type="button" data-auth="login">Log In</button>
+                        </div>
+                    </nav>
+                </div>
+                <div class="footerBottom">
+                    <span class="copyright">All rights reserved 2026</span>
+                </div>
             </footer>
         </section>
 
@@ -106,11 +224,26 @@
                 </div>
                 <div class="rightpch">
                     <button><i class="fa-solid fa-heart"></i><span class="btnLabel">Donate</span></button>
-                    <button class="signUpBtn" data-auth="signup"><i class="fa-solid fa-user-plus"></i><span
-                            class="btnLabel">Sign
-                            Up</span></button>
-                    <button data-auth="login"><i class="fa-solid fa-right-to-bracket"></i><span class="btnLabel">Log
-                            In</span></button>
+                    <div id="guestAuthButtons" class="authButtonsGroup">
+                        <button class="signUpBtn" data-auth="signup"><i class="fa-solid fa-user-plus"></i><span
+                                class="btnLabel">Sign
+                                Up</span></button>
+                        <button data-auth="login"><i class="fa-solid fa-right-to-bracket"></i><span class="btnLabel">Log
+                                In</span></button>
+                    </div>
+                    <div id="userAuthButtons" class="authButtonsGroup" style="display: none;">
+                        <div class="profileMenu">
+                            <button id="profileBtn" class="profileBtn" type="button" aria-haspopup="true" aria-expanded="false"
+                                aria-label="Account menu">
+                                <span id="profileUsername"></span>
+                            </button>
+                            <div id="profileDropdown" class="profileDropdown" style="display: none;">
+                                <span id="profileEmail"></span>
+                            </div>
+                        </div>
+                        <button id="logoutBtn" type="button" aria-label="Log out"><i
+                                class="fa-solid fa-right-from-bracket"></i><span class="btnLabel">Log Out</span></button>
+                    </div>
                 </div>
             </div>
             <div id="history">
@@ -171,7 +304,7 @@
 
                 <form action="" id="signupForm" class="authForm" nonvalidate>
                     <div class="authHead">
-                        <span class="eyebrow"><i class="fa-solid fa-feather"></i> Create your shelf</span>
+                        <span class="sectionTab"><i class="fa-solid fa-feather"></i> Create your shelf</span>
                         <h1 id="authCardTitle">Sign Up</h1>
                         <p>Unlimited recommendations via AI chat, plus saved picks, cover art, and a full search history you can revisit anytime.</p>
                     </div>
@@ -220,7 +353,7 @@
 
                 <form action="" id="loginForm" class="authForm" style="display: none;" nonvalidate>
                     <div class="authHead">
-                        <span class="eyebrow"><i class="fa-solid fa-book-open-reader"></i> Welcome back</span>
+                        <span class="sectionTab"><i class="fa-solid fa-book-open-reader"></i> Welcome back</span>
                         <h1>Log In</h1>
                         <p>Pick up right where you left off.</p>
                     </div>

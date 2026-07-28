@@ -67,11 +67,17 @@ const chatEntryBttn = document.getElementById("chatEntryBttn");
 const chatSpace = document.getElementById("chatSpace");
 const messagesArea = document.getElementById("messagesArea");
 
-chatEntryBttn.addEventListener('click', (e) => {
+function showChatPage() {
     landingPage.style.display = 'none';
     chatPage.style.display = 'block';
     document.body.classList.add('chatPageActive');
-})
+}
+
+function isOnLandingPage() {
+    return landingPage.style.display !== 'none';
+}
+
+chatEntryBttn.addEventListener('click', showChatPage);
 
 const toggleHistoryBtn = document.getElementById('toggleHistory');
 const closeHistoryBtn = document.getElementById('closeHistory');
@@ -539,6 +545,7 @@ const loginEmail = document.getElementById('loginEmail');
 const loginPassword = document.getElementById('loginPassword');
 
 const AUTH_TOKEN_KEY = 'shelfAuthToken';
+const AUTH_EMAIL_KEY = 'shelfAuthEmail';
 
 function getAuthToken() {
     return localStorage.getItem(AUTH_TOKEN_KEY);
@@ -552,14 +559,78 @@ function setAuthToken(token) {
     }
 }
 
+function getAuthEmail() {
+    return localStorage.getItem(AUTH_EMAIL_KEY);
+}
+
+function setAuthEmail(email) {
+    if (email) {
+        localStorage.setItem(AUTH_EMAIL_KEY, email);
+    } else {
+        localStorage.removeItem(AUTH_EMAIL_KEY);
+    }
+}
+
 let isGuest = !getAuthToken();
+
+const guestAuthButtons = document.getElementById('guestAuthButtons');
+const userAuthButtons = document.getElementById('userAuthButtons');
+const profileBtn = document.getElementById('profileBtn');
+const profileUsername = document.getElementById('profileUsername');
+const profileDropdown = document.getElementById('profileDropdown');
+const profileEmail = document.getElementById('profileEmail');
+const logoutBtn = document.getElementById('logoutBtn');
+
+function usernameFromEmail(email) {
+    if (!email) return '';
+    return email.split('@')[0];
+}
+
+function renderProfile(email) {
+    profileUsername.textContent = usernameFromEmail(email);
+    profileEmail.textContent = email || '';
+}
 
 function applyGuestUI() {
     toggleHistoryBtn.style.display = isGuest ? 'none' : 'block';
     if (isGuest) {
         chatPage.classList.remove('historyOpen');
     }
+
+    guestAuthButtons.style.display = isGuest ? 'flex' : 'none';
+    userAuthButtons.style.display = isGuest ? 'none' : 'flex';
+
+    if (isGuest) {
+        profileDropdown.style.display = 'none';
+    } else {
+        renderProfile(getAuthEmail());
+    }
 }
+
+profileBtn.addEventListener('click', () => {
+    const isOpen = profileDropdown.style.display === 'block';
+    profileDropdown.style.display = isOpen ? 'none' : 'block';
+    profileBtn.setAttribute('aria-expanded', String(!isOpen));
+});
+
+document.addEventListener('click', (e) => {
+    if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+        profileDropdown.style.display = 'none';
+        profileBtn.setAttribute('aria-expanded', 'false');
+    }
+});
+
+logoutBtn.addEventListener('click', () => {
+    setAuthToken(null);
+    setAuthEmail(null);
+    isGuest = true;
+    applyGuestUI();
+    closeHistorySidebar();
+    renderHistoryEmptyState();
+    messagesArea.innerHTML = '';
+    chatSpace.classList.remove('hasMessages');
+    setActiveHistoryItem(null);
+});
 
 applyGuestUI();
 if (!isGuest) loadHistory();
@@ -584,9 +655,13 @@ signUpForm.addEventListener('submit', async function (e) {
 
         const result = await response.json();
         setAuthToken(result.accessToken);
+        setAuthEmail(signupEmail.value);
         isGuest = false;
         applyGuestUI();
         loadHistory();
+        if (isOnLandingPage()) showChatPage();
+        signUpForm.reset();
+        window.closeAuth();
     } catch (err) {
         console.error("Signup failed:", err);
     }
@@ -612,9 +687,13 @@ logInForm.addEventListener('submit', async function (e) {
 
         const result = await response.json();
         setAuthToken(result.accessToken);
+        setAuthEmail(loginEmail.value);
         isGuest = false;
         applyGuestUI();
         loadHistory();
+        if (isOnLandingPage()) showChatPage();
+        logInForm.reset();
+        window.closeAuth();
     } catch (err) {
         console.error("Login failed:", err);
     }
