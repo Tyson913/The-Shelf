@@ -1,3 +1,24 @@
+(function trackAppViewportHeight() {
+    var root = document.documentElement;
+
+    function setAppHeight() {
+        var h = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
+        root.style.setProperty('--app-vh', h + 'px');
+    }
+
+    setAppHeight();
+
+    if (window.visualViewport) {
+        // visualViewport shrinks (and fires resize/scroll) when the on-screen
+        // keyboard opens on mobile, unlike window.innerHeight in most browsers.
+        window.visualViewport.addEventListener('resize', setAppHeight);
+        window.visualViewport.addEventListener('scroll', setAppHeight);
+    } else {
+        window.addEventListener('resize', setAppHeight);
+    }
+    window.addEventListener('orientationchange', setAppHeight);
+})();
+
 const catGenreMood = {
     "music": {
         "genre": ["Pop", "Rock", "Hip-Hop", "R&B", "Jazz", "Classical", "EDM", "Country", "Indie", "Lo-fi"],
@@ -581,13 +602,14 @@ const profileDropdown = document.getElementById('profileDropdown');
 const profileEmail = document.getElementById('profileEmail');
 const logoutBtn = document.getElementById('logoutBtn');
 
-function usernameFromEmail(email) {
+function avatarInitialFromEmail(email) {
     if (!email) return '';
-    return email.split('@')[0];
+    var match = email.match(/[a-zA-Z0-9]/);
+    return match ? match[0].toUpperCase() : '';
 }
 
 function renderProfile(email) {
-    profileUsername.textContent = usernameFromEmail(email);
+    profileUsername.textContent = avatarInitialFromEmail(email);
     profileEmail.textContent = email || '';
 }
 

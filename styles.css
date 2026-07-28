@@ -858,10 +858,6 @@ section {
   transition: margin-left 0.25s var(--ease), width 0.25s var(--ease);
 }
 
-#chatHeader .navLogo {
-  width: 178px;
-}
-
 .leftpch,
 .rightpch {
   display: flex;
@@ -1108,7 +1104,7 @@ section {
 
 #chatSpace {
   margin-top: var(--header-height);
-  min-height: calc(100vh - var(--header-height));
+  min-height: calc(var(--app-vh, 100dvh) - var(--header-height));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1271,7 +1267,7 @@ select {
 }
 
 #chatSpace.hasMessages {
-  height: calc(100vh - var(--header-height));
+  height: calc(var(--app-vh, 100dvh) - var(--header-height));
   overflow: hidden;
 }
 
@@ -1810,10 +1806,6 @@ select {
     padding: 0 14px;
   }
 
-  #chatHeader .navLogo {
-    width: 138px;
-  }
-
   .leftpch,
   .rightpch {
     gap: 6px;
@@ -1913,10 +1905,6 @@ select {
 
   .navLogo {
     width: 130px;
-  }
-
-  #chatHeader .navLogo {
-    width: 92px;
   }
 
   .siteNav {
@@ -2290,23 +2278,19 @@ select {
   background: #3e6fa3;
   color: #fff;
   font-family: inherit;
-  font-size: 0.7rem;
+  font-size: 1rem;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: 0 4px;
+  padding: 0;
   cursor: pointer;
   line-height: 1;
 }
 
 .profileBtn span {
   display: block;
-  width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   text-align: center;
 }
 
