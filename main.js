@@ -433,7 +433,7 @@ form.addEventListener('submit', async function (e) {
 
     try {
         const authToken = getAuthToken();
-        const response = await fetch("http://localhost:3000/api/recommendations", {
+        const response = await fetch('/api/recommendations', { 
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
